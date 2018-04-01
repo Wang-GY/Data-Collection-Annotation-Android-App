@@ -291,7 +291,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
               "username": "xxx",
               "email": "example@xxx.com",
               "password": "xxx",
-              "phone": "1234567890"
+              "phone": "1234567890",
               "credit": 100,
               "balance": 100
           }
@@ -329,7 +329,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
           "attributes": {
               "username": "xxx",
               "password": "xxx",
-              "phone": "1234567890"
+              "phone": "1234567890",
               "credit": 100
           }
       }
