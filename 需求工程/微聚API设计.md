@@ -171,8 +171,8 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
   ```Json
   {
-      'email': 'example@xxx.com',
-      'password': '123456'
+      "email": "example@xxx.com",
+      "password": "123456"
   }
   ```
 
@@ -185,10 +185,10 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
   ```Json
   {
-      'meta': {
+      "meta": {
       },
-      'data': {
-          'uri': '/api/v1/users/id/22'
+      "data": {
+          "uri": "/api/v1/users/id/22"
       }
   }
   ```
