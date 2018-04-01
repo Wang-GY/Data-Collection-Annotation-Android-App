@@ -1,4 +1,6 @@
-# API Design Document
+# API Design Document v0.1
+
+## Table of Content
 
 [TOC]
 
@@ -67,12 +69,28 @@ To page through all available items, use the metadata section of the JSON respon
 {
     "meta": {
         "result_set": {
-            "count": 25,
+            "count": 2,
             "offset": 0,
-            "limit": 25,
+            "limit": 2,
             "total": 77 
         }
-    }
+    },
+    "data": [
+        {
+        	"id": "1",
+            "type": "car",
+            "attributes": {
+            	"model": "Benz"
+            }
+    	},
+        {
+            "id": "2",
+            "type": "car",
+            "attributes": {
+            	"model": "Lamborghini"
+            }
+        }
+    ]
 }
 ```
 
