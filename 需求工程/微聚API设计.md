@@ -367,7 +367,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 ### Pictures
 
-####  1. Get Picture
+####  1. Get a Picture
 
 **Description:**
 
@@ -376,7 +376,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - URI
 
   ```http
-  GET /api/pictures?limit=20?offset=0
+  GET /api/pictures/{picture_id}
   ```
 
 
@@ -387,7 +387,28 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 **Response:**
 
-- Status Code: 
+- Status Code:  200 OK
+
+- Body
+
+  Binary image file
+
+**Errors:**
+
+- 404 NOT FOUND
+
+####  2. Batch Get Pictures
+
+**Step 1**
+
+**Request:**
+
+- URI
+
+  ```http
+  POST /api/v1/batchasks
+  ```
+
 
 - Body
 
@@ -395,26 +416,91 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
   {
       "data": [
           {
-              "type": "picture",
-              "id": "uuid1",
+              "type": "request",
               "attributes": {
-                  "src": "xxxx"
+                  "method": "GET",
+              	"url": "/api/v1/users/{user_id1}"
               }
           },
           {
-              "type": "picture",
-              "id": "uuid2",
+              "type": "request",
               "attributes": {
-                  "src": "xxxx"
+                  "method": "GET",
+              	"url": "/api/v1/users/{user_id1}"
               }
-          }
-      ]
+          },
+      ]    
   }
   ```
 
+
+**Response:**
+
+- Status Code: 201 Created
+
+- Body
+
+  ```Json
+  {
+      "data": {
+          "attributes": {
+  			"url": "/api/v1/batchasks/{ask_id}"
+          }
+      }
+  }
+  ```
+
+**Step 2**
+
+**Request:**
+
+- URI
+
+  ```http
+  GET http://example.com/api/batchtask/{ask_id}
+  ```
+
+- Body
+
+  EMPTY
+
+**Response:**
+
+- Status Code: 200 OK
+
+- Body
+
+  A **zip file** that contains the resources asked by user.
+
+####  3. Delete a picture
+
+**Description:**
+
+**Request:**
+
+- URI
+
+  ```http
+  DELETE /api/v1/pictures/{picture_id}
+  ```
+
+
+- Body
+
+  EMPTY
+
+
+**Response:**
+
+- Status Code: 204 DELETED
+
+- Body
+
+  EMPTY
+
 **Errors:**
 
-- 404 NOT FOUND
+- 404 ERROR
 
 ### Tasks
 
@@ -427,7 +513,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - URI
 
   ```http
-  POST /api/tasks
+  POST /api/v1/tasks
   ```
 
 
@@ -460,41 +546,9 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 **Errors:**
 
-####  1. Get Pictures Related to a Tasks
+####  2. Get Pictures Related to a Tasks
 
-**Description:**
-
-**Request:**
-
-- URI
-
-  ```http
-
-  ```
-
-
-- Body
-
-  ```Json
-  {
-      
-  }
-  ```
-
-
-**Response:**
-
-- Status Code: 
-
-- Body
-
-  ```Json
-  {
-      
-  }
-  ```
-
-**Errors:**
+The links of the pictures should be contained in the xml file of the task.
 
 ### Commits
 
@@ -515,22 +569,114 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
   ```Json
   {
-      
+      "data": {
+          "id": "uuid",
+          "type": "task",
+          "attributes": {
+              "task_id": "uuid",
+              "author_id": "uuid",
+              "picture_id": "uuid",
+              "xml": "xxx"
+          }
+      }
   }
   ```
 
 
 **Response:**
 
-- Status Code: 
+- Status Code:  201 CREATED
+
+- Body
+
+  EMPTY
+
+**Errors:**
+
+####  2. Get User Commits
+
+**Description:**
+
+**Request:**
+
+- URI
+
+  ```http
+  GET /api/commits?user={user_id}&task={task_id}
+  ```
+
+
+- Body
+
+  EMPTY
+
+
+**Response:**
+
+- Status Code: 200 OK
 
 - Body
 
   ```Json
   {
-      
+      "data": [{
+          "id": "uuid",
+          "type": "task",
+          "attributes": {
+              "task_id": "uuid",
+              "author_id": "uuid",
+              "picture_id": "uuid",
+              "xml": "xxx"
+          }
+      }]
   }
   ```
 
 **Errors:**
+
+- Commits not found. 404
+
+####  3. Update a commit
+
+**Description:**
+
+**Request:**
+
+- URI
+
+  ```http
+  PUT /api/v1/commits/{commit_id}
+  ```
+
+
+- Body
+
+  ```Json
+  {
+      {
+      "data": {
+          "id": "uuid",
+          "type": "task",
+          "attributes": {
+              "task_id": "uuid",
+              "author_id": "uuid",
+              "picture_id": "uuid",
+              "xml": "xxx"
+          }
+      }
+  }
+  ```
+
+
+**Response:**
+
+- Status Code:  200 OK
+
+- Body
+
+  EMPTY
+
+**Errors:**
+
+- 404 NOT FOUND
 
