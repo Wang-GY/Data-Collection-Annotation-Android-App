@@ -33,7 +33,7 @@ Do not use verbs:
 ### 3. Use sub-resources for relations
 
 - `GET /cars/711/drivers/`  Returns a list of drivers for car 711.
-- `GET /cars/711/drivers/4` Returns driver #4 for car 711
+- `GET /cars/711/drivers/4` Returns driver #4 for car 711.
 
 ### 4. Provide filtering, sorting and paging for collections 
 
@@ -77,14 +77,14 @@ To page through all available items, use the metadata section of the JSON respon
     },
     "data": [
         {
-        	"id": "1",
+        	"id": "uuid1",
             "type": "car",
             "attributes": {
             	"model": "Benz"
             }
     	},
         {
-            "id": "2",
+            "id": "uuid2",
             "type": "car",
             "attributes": {
             	"model": "Lamborghini"
@@ -96,12 +96,12 @@ To page through all available items, use the metadata section of the JSON respon
 
 **Note:** Send GET request to  `/cars?limit=0` to get a json that just contains metadata.
 
-### 5. Version the API
+### 5. Versioning the API
 
 Make the API Version mandatory and do not release an unversioned API. Use a simple ordinal number.
 
 ```http
-/app/api/v1
+/api/v1
 ```
 
 ### 6. Handle Errors with HTTP status codes
@@ -138,7 +138,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 ## API
 
-### User
+### Users
 ####  0. Template
 
 **Description:**
@@ -237,7 +237,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - URI
 
   ```http
-  POST /sessions
+  POST /api/v1/sessions
   ```
 
 
@@ -265,7 +265,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
   {
       "data": {
           "attributes": {
-             "id": "xxx",
+             "user_id": "xxx",
              "token": "xxx" 
           }
       }
@@ -285,7 +285,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - URI
 
   ```http
-  GET /api/v1/users/id/xxx
+  GET /api/v1/users/{id}
   ```
 
 
@@ -333,7 +333,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - URI
 
   ```http
-  PUT /api/v1/users/id/xxx
+  PUT /api/v1/users/{id}
   ```
 
 
@@ -365,5 +365,172 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 **Errors:**
 
-### Task
+### Pictures
+
+####  1. Get Picture
+
+**Description:**
+
+**Request:**
+
+- URI
+
+  ```http
+  GET /api/pictures?limit=20?offset=0
+  ```
+
+
+- Body
+
+  EMPTY
+
+
+**Response:**
+
+- Status Code: 
+
+- Body
+
+  ```Json
+  {
+      "data": [
+          {
+              "type": "picture",
+              "id": "uuid1",
+              "attributes": {
+                  "src": "xxxx"
+              }
+          },
+          {
+              "type": "picture",
+              "id": "uuid2",
+              "attributes": {
+                  "src": "xxxx"
+              }
+          }
+      ]
+  }
+  ```
+
+**Errors:**
+
+- 404 NOT FOUND
+
+### Tasks
+
+####  1. Create a Task
+
+**Description:**
+
+**Request:**
+
+- URI
+
+  ```http
+  POST /api/tasks
+  ```
+
+
+- Body
+
+  ```Json
+  {
+      "data": {
+          "id": "uuid",
+          "type": "task",
+          "attributes": {
+              "xml": "xxxx",
+              "title": "xxx",
+              "start": "xxxx",
+              "end": "xxx",
+              "descriptions": "xxx"
+          }
+      }
+  }
+  ```
+
+
+**Response:**
+
+- Status Code:  201 Created
+
+- Body
+
+  EMPTY
+
+**Errors:**
+
+####  1. Get Pictures Related to a Tasks
+
+**Description:**
+
+**Request:**
+
+- URI
+
+  ```http
+
+  ```
+
+
+- Body
+
+  ```Json
+  {
+      
+  }
+  ```
+
+
+**Response:**
+
+- Status Code: 
+
+- Body
+
+  ```Json
+  {
+      
+  }
+  ```
+
+**Errors:**
+
+### Commits
+
+####  1. Upload a commit
+
+**Description:**
+
+**Request:**
+
+- URI
+
+  ```http
+  POST /api/commits
+  ```
+
+
+- Body
+
+  ```Json
+  {
+      
+  }
+  ```
+
+
+**Response:**
+
+- Status Code: 
+
+- Body
+
+  ```Json
+  {
+      
+  }
+  ```
+
+**Errors:**
 
