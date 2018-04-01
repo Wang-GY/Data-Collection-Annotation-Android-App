@@ -65,7 +65,7 @@ To page through all available items, use the metadata section of the JSON respon
 
 ```JSON
 {
-    "metadata": {
+    "meta": {
         "result_set": {
             "count": 25,
             "offset": 0,
@@ -107,12 +107,16 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 ```Json
 {
     "errors": [{
-        "userMessage": "Sorry, the requested resource does not exist",
-        "internalMessage": "No car which id = 711 is found in the database",
-        "code": 404
+        "title": "This is a short human readable msg, MUST not be empty",
+        "detail": "This is human readable detail msg, can be empty",
+        "status": 404
     }]
 }
 ```
+
+## JSON Specifications
+
+[Specifications](http://jsonapi.org/format/)
 
 ## API
 
@@ -171,8 +175,14 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
   ```Json
   {
-      "email": "example@xxx.com",
-      "password": "123456"
+      "data": {
+          "type": "user",
+          "id": "uuid",
+          "attributes": {
+              "email": "example@xxx.com",
+      		"password": "xxx"
+          } 
+      }
   }
   ```
 
@@ -185,17 +195,157 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
   ```Json
   {
-      "meta": {
-      },
       "data": {
-          "uri": "/api/v1/users/id/22"
+          "type": "user",
+          "id": "uuid",
+          "attributes": {
+              "email": "example@xxx.com",
+      		"password": "xxx"
+          } 
       }
   }
   ```
 
 **Errors:**
 
-- Username exists
+- Email exists
+
+####  2. Login
+
+**Description:**
+
+**Request:**
+
+- URI
+
+  ```http
+  POST /sessions
+  ```
+
+
+- Body
+
+  ```Json
+  {
+      "data": {
+          "attributes": {
+              "email": "example@xxx.com",
+      		"password": "xxx"
+          }
+      }
+  }
+  ```
+
+
+**Response:**
+
+- Status Code: 200
+
+- Body
+
+  ```Json
+  {
+      "data": {
+          "attributes": {
+             "id": "xxx",
+             "token": "xxx" 
+          }
+      }
+  }
+  ```
+
+**Errors:**
+
+- Bad authentication
+
+####  3. Get User Profiles
+
+**Description:**
+
+**Request:**
+
+- URI
+
+  ```http
+  GET /api/v1/users/id/xxx
+  ```
+
+
+- Body
+
+  EMPTY
+
+
+**Response:**
+
+- Status Code: 200
+
+- Body
+
+  ```Json
+  {
+      "data": {
+          "id": "xxx",
+          "type": "user",
+          "attributes": {
+              "username": "xxx",
+              "email": "example@xxx.com",
+              "password": "xxx",
+              "phone": "1234567890"
+              "credit": 100,
+              "balance": 100
+          }
+      }
+  }
+  ```
+
+**Errors:**
+
+- No such user
+
+####  4. Update User Profiles
+
+**Description:**
+
+- Some infomation such as email, user balance **MUST** not be updated by this way! 
+- **Only** the fields that appears in the JSON body should be updated! 
+
+**Request:**
+
+- URI
+
+  ```http
+  PUT /api/v1/users/id/xxx
+  ```
+
+
+- Body
+
+  ```Json
+  {
+      "data": {
+          "id": "xxx",
+          "type": "user",
+          "attributes": {
+              "username": "xxx",
+              "password": "xxx",
+              "phone": "1234567890"
+              "credit": 100
+          }
+      }
+  }
+  ```
+
+
+**Response:**
+
+- Status Code: 200 OK
+
+- Body
+
+  EMPTY
+
+**Errors:**
 
 ### Task
 
