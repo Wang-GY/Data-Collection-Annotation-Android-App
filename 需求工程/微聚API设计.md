@@ -8,7 +8,7 @@
 
 ### 1. Use nouns but no verbs
 
-| Resource | GET (read)            | POST (create)            | PUT (update)        | DELETE            |
+| Resource | GET (read)            | POST (create)            | PATCH (update)        | DELETE            |
 | -------- | --------------------- | ------------------------ | ------------------- | ----------------- |
 | /cars    | Return a list of cars | Create a new car         | Bulk update of cars | Delete all cars   |
 | /cars/1  | Return car id = 1     | Method not allowed (405) | Update car id = 1   | Delete car id = 1 |
@@ -35,7 +35,7 @@ Do not use verbs:
 - `GET /cars/711/drivers/`  Returns a list of drivers for car 711.
 - `GET /cars/711/drivers/4` Returns driver #4 for car 711.
 
-### 4. Provide filtering, sorting and paging for collections 
+### 4. Provide filtering, sorting and paging for collections
 
 **Filtering:**
 
@@ -72,7 +72,7 @@ To page through all available items, use the metadata section of the JSON respon
             "count": 2,
             "offset": 0,
             "limit": 2,
-            "total": 77 
+            "total": 77
         }
     },
     "data": [
@@ -116,7 +116,7 @@ Make the API Version mandatory and do not release an unversioned API. Use a simp
 - 403 – **Forbidden** – The server understood the request, but is refusing it or the access is not allowed.
 - 404 – **Not found** – There is no resource behind the URI.
 - 500 – **Internal Server Error** –  You should avoid this error. If an error occurs in the global catch blog, the stracktrace should be logged and not returned as response.
-- 400 – **Bad Request** – The request was invalid or cannot be served. **The exact error should be explained in the error payload.** 
+- 400 – **Bad Request** – The request was invalid or cannot be served. **The exact error should be explained in the error payload.**
 
 **Error payloads**
 
@@ -146,7 +146,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - URI
 
   ```http
-  
+
   ```
 
 
@@ -154,25 +154,37 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
   ```Json
   {
-      
+
   }
   ```
 
 
 **Response:**
 
-- Status Code: 
+- Status Code:
 
 - Body
 
   ```Json
   {
-      
+
   }
   ```
 
 **Errors:**
+- Status Code:
 
+- Body
+
+```Json
+{
+    "errors": [{
+        "title": "This is a short human readable msg, MUST not be empty",
+        "detail": "This is human readable detail msg, can be empty",
+        "status": 404
+    }]
+}
+```
 
 ### Users
 #### 1. Registration
@@ -198,7 +210,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
           "attributes": {
               "email": "example@xxx.com",
       		"password": "xxx"
-          } 
+          }
       }
   }
   ```
@@ -218,14 +230,27 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
           "attributes": {
               "email": "example@xxx.com",
       		"password": "xxx"
-          } 
+          }
       }
   }
   ```
 
 **Errors:**
 
-- Email exists
+- Email exists    
+
+- Status Code: 404  
+
+- Body:
+```JSON
+{
+    "errors": [{
+        "title": "This email has already been registered",
+        "detail": "can not insert into users,violate email unique constrain",
+        "status": 404
+    }]
+}
+```
 
 ####  2. Login
 
@@ -265,7 +290,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
       "data": {
           "attributes": {
              "user_id": "xxx",
-             "token": "xxx" 
+             "token": "xxx"
           }
       }
   }
@@ -273,8 +298,35 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 **Errors:**
 
-- Bad authentication
+- email not registered
+- Status Code: 400
+- Body
 
+```JSON
+
+{
+    "errors": [{
+        "title": "email not registered",
+        "detail": "can not find email in users",
+        "status": 400
+    }]
+}
+
+```
+
+- wrong password
+- Status Code: 400
+- Body
+```JSON
+{
+    "errors": [{
+        "title": "email password does not match",
+        "detail": "email password does not match",
+        "status": 400
+    }]
+}
+
+```
 ####  3. Get User Profiles
 
 **Description:**
@@ -307,10 +359,12 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
           "attributes": {
               "username": "xxx",
               "email": "example@xxx.com",
-              "password": "xxx",
               "phone": "1234567890",
               "credit": 100,
-              "balance": 100
+              "balance": 100,
+              "nickname":"xxx",
+              "level":0,
+              "avatar":"URL"
           }
       }
   }
@@ -320,19 +374,44 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 - No such user
 
+- Status Code: 404
+- Body
+```JSON
+{
+    "errors": [{
+        "title": "No such user",
+        "detail": "No such user",
+        "status": 404
+    }]
+}
+```
+- Permission denied
+
+- Status Code: 401
+- Body
+```JSON
+{
+    "errors": [{
+        "title": "Please login",
+        "detail": "Permission denied",
+        "status": 401
+    }]
+}
+```
+
 ####  4. Update User Profiles
 
 **Description:**
 
-- Some infomation such as email, user balance **MUST** not be updated by this way! 
-- **Only** the fields that appears in the JSON body should be updated! 
+- Some infomation such as email, user balance **MUST** not be updated by this way!
+- **Only** the fields that appears in the JSON body should be updated!
 
 **Request:**
 
 - URI
 
   ```http
-  PUT /api/v1/users/{id}
+  PATCH /api/v1/users/{id}
   ```
 
 
@@ -359,10 +438,40 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - Status Code: 200 OK
 
 - Body
-
-  EMPTY
+```Json
+{
+    "data": {
+        "id": "xxx",
+        "type": "user",
+        "attributes": {
+            "username": "xxx",
+            "email": "example@xxx.com",
+            "phone": "1234567890",
+            "credit": 100,
+            "balance": 100,
+            "nickname":"xxx",
+            "level":0,
+            "avatar":"URL"
+        }
+    }
+}
+```
 
 **Errors:**
+
+- Permission denied
+
+- Status Code: 401
+- Body
+```JSON
+{
+    "errors": [{
+        "title": "Please login",
+        "detail": "Permission denied",
+        "status": 401
+    }]
+}
+```
 
 ### Pictures
 
@@ -394,7 +503,35 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 **Errors:**
 
-- 404 NOT FOUND
+- Permission denied
+
+- Status Code: 401
+- Body
+```JSON
+{
+    "errors": [{
+        "title": "Please login",
+        "detail": "Permission denied",
+        "status": 401
+    }]
+}
+```
+
+- File not found
+
+- Status Code: 404
+
+- Body
+
+```Json
+{
+    "errors": [{
+        "title": "File not found",
+        "detail": "File not found",
+        "status": 404
+    }]
+}
+```
 
 ####  2. Batch Get Pictures
 
@@ -418,14 +555,14 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
               "type": "request",
               "attributes": {
                   "method": "GET",
-              	"url": "/api/v1/users/{user_id1}"
+              	"url": "/api/v1/pictures/{picture_id1}"
               }
           },
           {
               "type": "request",
               "attributes": {
                   "method": "GET",
-              	"url": "/api/v1/users/{user_id1}"
+              	"url": "/api/v1/pictures/{picture_id1}"
               }
           },
       ]    
@@ -471,6 +608,37 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
   A **zip file** that contains the resources asked by user.
 
+**ERRORS:**
+- Permission denied
+
+- Status Code: 401
+- Body
+```JSON
+{
+    "errors": [{
+        "title": "Please login",
+        "detail": "Permission denied",
+        "status": 401
+    }]
+}
+```
+
+- File not found
+
+- Status Code: 404
+
+- Body
+
+```Json
+{
+    "errors": [{
+        "title": "File not found",
+        "detail": "File not found",
+        "status": 404
+    }]
+}
+```
+
 ####  3. Delete a picture
 
 **Description:**
@@ -499,13 +667,43 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 **Errors:**
 
-- 404 ERROR
+- Permission denied
+
+- Status Code: 401
+- Body
+```JSON
+{
+    "errors": [{
+        "title": "Please login",
+        "detail": "Permission denied",
+        "status": 401
+    }]
+}
+```
+
+- File not found
+
+- Status Code: 404
+
+- Body
+
+```Json
+{
+    "errors": [{
+        "title": "File not found",
+        "detail": "File not found",
+        "status": 404
+    }]
+}
+```
 
 ### Tasks
 
 ####  1. Create a Task
 
 **Description:**
+create a collection task or annnotation task.  
+TODO: XML standard (URL of pictures,task labels)
 
 **Request:**
 
@@ -545,6 +743,36 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 **Errors:**
 
+- Permission denied
+
+- Status Code: 401
+- Body
+```JSON
+{
+    "errors": [{
+        "title": "Please login",
+        "detail": "Permission denied",
+        "status": 401
+    }]
+}
+```
+
+- File not found
+
+- Status Code: 404
+
+- Body
+
+```Json
+{
+    "errors": [{
+        "title": "File not found",
+        "detail": "picture url not exists",
+        "status": 404
+    }]
+}
+```
+
 ####  2. Get Pictures Related to a Tasks
 
 The links of the pictures should be contained in the xml file of the task.
@@ -554,6 +782,7 @@ The links of the pictures should be contained in the xml file of the task.
 ####  1. Upload a commit
 
 **Description:**
+Finish a subtask and upload.
 
 **Request:**
 
@@ -569,14 +798,14 @@ The links of the pictures should be contained in the xml file of the task.
   ```Json
   {
       "data": {
-          "id": "uuid",
-          "type": "task",
-          "attributes": {
-              "task_id": "uuid",
+          "id": "commit_id",
+          "type": "commit",
+          "attributes":[{
+              "task_id":"uuid",
               "author_id": "uuid",
               "picture_id": "uuid",
               "xml": "xxx"
-          }
+          }]
       }
   }
   ```
@@ -591,6 +820,18 @@ The links of the pictures should be contained in the xml file of the task.
   EMPTY
 
 **Errors:**
+- Permission denied
+- Status Code: 401
+- Body
+```JSON
+{
+    "errors": [{
+        "title": "Please login",
+        "detail": "Permission denied",
+        "status": 401
+    }]
+}
+```
 
 ####  2. Get User Commits
 
@@ -618,64 +859,37 @@ The links of the pictures should be contained in the xml file of the task.
 
   ```Json
   {
+      "meta":{
+        "total_commits":10,
+
+      },
       "data": [{
-          "id": "uuid",
-          "type": "task",
-          "attributes": {
+          "id": "commit_id",
+          "type": "commit",
+          "attributes": [{
               "task_id": "uuid",
               "author_id": "uuid",
               "picture_id": "uuid",
               "xml": "xxx"
-          }
+          }]
       }]
   }
   ```
 
 **Errors:**
 
-- Commits not found. 404
+- Commits not found
 
-####  3. Update a commit
-
-**Description:**
-
-**Request:**
-
-- URI
-
-  ```http
-  PUT /api/v1/commits/{commit_id}
-  ```
-
+- Status Code:404
 
 - Body
 
-  ```Json
-  {
-      {
-      "data": {
-          "id": "uuid",
-          "type": "task",
-          "attributes": {
-              "task_id": "uuid",
-              "author_id": "uuid",
-              "picture_id": "uuid",
-              "xml": "xxx"
-          }
-      }
-  }
-  ```
-
-
-**Response:**
-
-- Status Code:  200 OK
-
-- Body
-
-  EMPTY
-
-**Errors:**
-
-- 404 NOT FOUND
-
+```Json
+{
+    "errors": [{
+        "title": "You haven't take this task",
+        "detail": "can not find commits of this task",
+        "status": 404
+    }]
+}
+```
