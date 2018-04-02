@@ -137,9 +137,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 [Specifications](http://jsonapi.org/format/)
 
 ## API
-
-### Users
-####  0. Template
+####  Template
 
 **Description:**
 
@@ -176,6 +174,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 **Errors:**
 
 
+### Users
 #### 1. Registration
 
 **Description:**
