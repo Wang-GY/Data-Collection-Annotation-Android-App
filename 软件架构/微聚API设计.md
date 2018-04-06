@@ -364,7 +364,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
               "balance": 100,
               "nickname":"xxx",
               "level":0,
-              "avatar":"URL"
+              "avatar":"URL",
+              "register_date":"xxx",
+              "gender":1,
+              "level":0,
+              "privilege":0
           }
       }
   }
@@ -484,7 +488,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - URI
 
   ```http
-  GET /api/pictures/{picture_id}
+  GET /api/pictures/{picture_url}
   ```
 
 
@@ -555,14 +559,14 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
               "type": "request",
               "attributes": {
                   "method": "GET",
-              	"url": "/api/v1/pictures/{picture_id1}"
+              	"url": "/api/v1/pictures/{picture_url1}"
               }
           },
           {
               "type": "request",
               "attributes": {
                   "method": "GET",
-              	"url": "/api/v1/pictures/{picture_id1}"
+              	"url": "/api/v1/pictures/{picture_url1}"
               }
           },
       ]    
@@ -648,7 +652,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - URI
 
   ```http
-  DELETE /api/v1/pictures/{picture_id}
+  DELETE /api/v1/pictures/{picture_url}
   ```
 
 
@@ -803,7 +807,7 @@ Finish a subtask and upload.
           "attributes":[{
               "task_id":"uuid",
               "author_id": "uuid",
-              "picture_id": "uuid",
+              "picture_url": "uuid",
               "xml": "xxx"
           }]
       }
@@ -869,7 +873,7 @@ Finish a subtask and upload.
           "attributes": [{
               "task_id": "uuid",
               "author_id": "uuid",
-              "picture_id": "uuid",
+              "picture_url": "uuid",
               "xml": "xxx"
           }]
       }]
