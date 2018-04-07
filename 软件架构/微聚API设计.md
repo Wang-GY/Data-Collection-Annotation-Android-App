@@ -780,6 +780,157 @@ TODO: XML standard (URL of pictures,task labels)
 ####  2. Get Pictures Related to a Tasks
 
 The links of the pictures should be contained in the xml file of the task.
+#### 3. *Get tasks id multiple*
+Init task window.
+初始化界面时可能会需要请求任务信息，后端返回任务id，需要完善。
+####  4. Get task Profiles
+
+**Description:**
+
+**Request:**
+
+- URI
+
+  ```http
+  GET /api/v1/tasks/{task_id}
+  ```
+
+
+- Body
+
+  EMPTY
+
+
+**Response:**
+
+- Status Code: 200
+
+- Body
+
+  ```Json
+  {   "meta":{"label number":5},
+      "data": {
+          "id": "xxx",
+          "type": "task",
+          "attributes": {
+              "name": "xxx",
+              "description": "xxx",
+              "start_time": "1234567890",
+              "type": 0,
+              "size": 100,
+              "data_path":"xxx",
+              "creater":0,
+              "progress":20,
+              "labels":["label1","label2","label3..."]
+          }
+      }
+  }
+  ```
+
+**Errors:**
+
+- No such task
+
+- Status Code: 404
+- Body
+```JSON
+{
+    "errors": [{
+        "title": "No such task",
+        "detail": "No such task",
+        "status": 404
+    }]
+}
+```
+- Permission denied
+
+- Status Code: 401
+- Body
+```JSON
+{
+    "errors": [{
+        "title": "Please login",
+        "detail": "Permission denied",
+        "status": 401
+    }]
+}
+```
+
+####  5. ~~Update task Profiles~~
+
+**Description:**
+
+- Some infomation such as progress, labels **MUST** not be updated by this way!
+- **Only** the fields that appears in the JSON body should be updated!
+
+**Request:**
+
+- URI
+
+  ```http
+  PATCH /api/v1/tasks/{id}
+  ```
+
+
+- Body
+
+  ```Json
+  {
+      "data": {
+          "id": "xxx",
+          "type": "task",
+          "attributes": {
+              "name": "xxx",
+              "description": "xxx",
+              "size": 100
+          }
+      }
+  }
+  ```
+
+
+**Response:**
+
+- Status Code: 200 OK
+
+- Body
+```Json
+{   "meta":{"label number":5},
+    "data": {
+        "id": "xxx",
+        "type": "task",
+        "attributes": {
+            "name": "xxx",
+            "description": "xxx",
+            "start_time": "1234567890",
+            "type": 0,
+            "size": 100,
+            "data_path":"xxx",
+            "creater":0,
+            "progress":20,
+            "labels":["label1","label2","label3..."]
+        }
+    }
+}
+```
+
+**Errors:**
+
+- Permission denied
+
+- Status Code: 401
+- Body
+```JSON
+{
+    "errors": [{
+        "title": "Please login",
+        "detail": "Permission denied",
+        "status": 401
+    }]
+}
+```
+
+
 
 ### Commits
 
