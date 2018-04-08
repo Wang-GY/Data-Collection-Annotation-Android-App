@@ -78,17 +78,11 @@ To page through all available items, use the metadata section of the JSON respon
     "data": [
         {
         	"id": "uuid1",
-            "type": "car",
-            "attributes": {
-            	"model": "Benz"
-            }
+            "model": "Benz"
     	},
         {
             "id": "uuid2",
-            "type": "car",
-            "attributes": {
-            	"model": "Lamborghini"
-            }
+            "model": "Lamborghini"
         }
     ]
 }
@@ -205,12 +199,9 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
   ```Json
   {
       "data": {
-          "type": "user",
           "id": "uuid",
-          "attributes": {
-              "email": "example@xxx.com",
-      		"password": "xxx"
-          }
+          "email": "example@xxx.com",
+          "password": "xxx"
       }
   }
   ```
@@ -225,12 +216,9 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
   ```Json
   {
       "data": {
-          "type": "user",
           "id": "uuid",
-          "attributes": {
-              "email": "example@xxx.com",
-      		"password": "xxx"
-          }
+          "email": "example@xxx.com",
+          "password": "xxx"
       }
   }
   ```
@@ -270,10 +258,8 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
   ```Json
   {
       "data": {
-          "attributes": {
-              "email": "example@xxx.com",
-      		"password": "xxx"
-          }
+          "email": "example@xxx.com",
+          "password": "xxx"
       }
   }
   ```
@@ -288,10 +274,8 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
   ```Json
   {
       "data": {
-          "attributes": {
-             "user_id": "xxx",
-             "token": "xxx"
-          }
+          "user_id": "xxx",
+          "token": "xxx"
       }
   }
   ```
@@ -355,21 +339,18 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
   {
       "data": {
           "id": "xxx",
-          "type": "user",
-          "attributes": {
-              "username": "xxx",
-              "email": "example@xxx.com",
-              "phone": "1234567890",
-              "credit": 100,
-              "balance": 100,
-              "nickname":"xxx",
-              "level":0,
-              "avatar":"URL",
-              "register_date":"xxx",
-              "gender":1,
-              "level":0,
-              "privilege":0
-          }
+          "username": "xxx",
+          "email": "example@xxx.com",
+          "phone": "1234567890",
+          "credit": 100,
+          "balance": 100,
+          "nickname":"xxx",
+          "level":0,
+          "avatar":"URL",
+          "register_date":"xxx",
+          "gender":1,
+          "level":0,
+          "privilege":0
       }
   }
   ```
@@ -425,13 +406,10 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
   {
       "data": {
           "id": "xxx",
-          "type": "user",
-          "attributes": {
-              "username": "xxx",
-              "password": "xxx",
-              "phone": "1234567890",
-              "credit": 100
-          }
+          "username": "xxx",
+          "password": "xxx",
+          "phone": "1234567890",
+          "credit": 100
       }
   }
   ```
@@ -447,16 +425,14 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
     "data": {
         "id": "xxx",
         "type": "user",
-        "attributes": {
-            "username": "xxx",
-            "email": "example@xxx.com",
-            "phone": "1234567890",
-            "credit": 100,
-            "balance": 100,
-            "nickname":"xxx",
-            "level":0,
-            "avatar":"URL"
-        }
+        "username": "xxx",
+        "email": "example@xxx.com",
+        "phone": "1234567890",
+        "credit": 100,
+        "balance": 100,
+        "nickname":"xxx",
+        "level":0,
+        "avatar":"URL"
     }
 }
 ```
@@ -556,18 +532,12 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
   {
       "data": [
           {
-              "type": "request",
-              "attributes": {
-                  "method": "GET",
-              	"url": "/api/v1/pictures/{picture_url1}"
-              }
+              "method": "GET",
+              "url": "/api/v1/pictures/{picture_url1}"
           },
           {
-              "type": "request",
-              "attributes": {
-                  "method": "GET",
-              	"url": "/api/v1/pictures/{picture_url1}"
-              }
+              "method": "GET",
+              "url": "/api/v1/pictures/{picture_url1}"
           },
       ]    
   }
@@ -583,9 +553,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
   ```Json
   {
       "data": {
-          "attributes": {
-  			"url": "/api/v1/batchasks/{ask_id}"
-          }
+          "url": "/api/v1/batchasks/{ask_id}"
       }
   }
   ```
@@ -724,14 +692,11 @@ TODO: XML standard (URL of pictures,task labels)
   {
       "data": {
           "id": "uuid",
-          "type": "task",
-          "attributes": {
-              "xml": "xxxx",
-              "title": "xxx",
-              "start": "xxxx",
-              "end": "xxx",
-              "descriptions": "xxx"
-          }
+          "xml": "xxxx",
+          "title": "xxx",
+          "start": "xxxx",
+          "end": "xxx",
+          "descriptions": "xxx"
       }
   }
   ```
@@ -811,18 +776,15 @@ Init task window.
   {   "meta":{"label number":5},
       "data": {
           "id": "xxx",
-          "type": "task",
-          "attributes": {
-              "name": "xxx",
-              "description": "xxx",
-              "start_time": "1234567890",
-              "type": 0,
-              "size": 100,
-              "data_path":"xxx",
-              "creater":0,
-              "progress":20,
-              "labels":["label1","label2","label3..."]
-          }
+          "name": "xxx",
+          "description": "xxx",
+          "start_time": "1234567890",
+          "type": 0,
+          "size": 100,
+          "data_path":"xxx",
+          "creater":0,
+          "progress":20,
+          "labels":["label1","label2","label3..."]
       }
   }
   ```
@@ -878,12 +840,9 @@ Init task window.
   {
       "data": {
           "id": "xxx",
-          "type": "task",
-          "attributes": {
-              "name": "xxx",
-              "description": "xxx",
-              "size": 100
-          }
+          "name": "xxx",
+          "description": "xxx",
+          "size": 100
       }
   }
   ```
@@ -899,17 +858,15 @@ Init task window.
     "data": {
         "id": "xxx",
         "type": "task",
-        "attributes": {
-            "name": "xxx",
-            "description": "xxx",
-            "start_time": "1234567890",
-            "type": 0,
-            "size": 100,
-            "data_path":"xxx",
-            "creater":0,
-            "progress":20,
-            "labels":["label1","label2","label3..."]
-        }
+        "name": "xxx",
+        "description": "xxx",
+        "start_time": "1234567890",
+        "type": 0,
+        "size": 100,
+        "data_path":"xxx",
+        "creater":0,
+        "progress":20,
+        "labels":["label1","label2","label3..."]
     }
 }
 ```
@@ -954,13 +911,14 @@ Finish a subtask and upload.
   {
       "data": {
           "id": "commit_id",
-          "type": "commit",
-          "attributes":[{
-              "task_id":"uuid",
-              "author_id": "uuid",
-              "picture_url": "uuid",
-              "xml": "xxx"
-          }]
+          "task_id":"uuid",
+          "author_id": "uuid",
+          "result":[
+              {
+                 "picture_url": "uuid",
+          		"xml": "xxx" 
+              }
+          ]
       }
   }
   ```
@@ -1014,20 +972,17 @@ Finish a subtask and upload.
 
   ```Json
   {
-      "meta":{
-        "total_commits":10,
-
-      },
-      "data": [{
+      "data": {
           "id": "commit_id",
-          "type": "commit",
-          "attributes": [{
-              "task_id": "uuid",
-              "author_id": "uuid",
-              "picture_url": "uuid",
-              "xml": "xxx"
-          }]
-      }]
+          "task_id": "uuid",
+          "author_id": "uuid",
+          "result": [
+              {
+                	"picture_url": "uuid",
+          		"xml": "xxx"  
+              }
+          ]
+      }
   }
   ```
 
