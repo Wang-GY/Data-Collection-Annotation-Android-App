@@ -274,7 +274,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
   ```Json
   {
       "data": {
-          "user_id": "xxx",
+          "id": "user_id",
           "token": "xxx"
       }
   }
@@ -341,7 +341,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
           "id": "xxx",
           "username": "xxx",
           "email": "example@xxx.com",
-          "phone": "1234567890",
+          "phone": 1234567890,
           "credit": 100,
           "balance": 100,
           "nickname":"xxx",
@@ -408,7 +408,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
           "id": "xxx",
           "username": "xxx",
           "password": "xxx",
-          "phone": "1234567890",
+          "phone": 1234567890,
           "credit": 100
       }
   }
@@ -427,7 +427,7 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
         "type": "user",
         "username": "xxx",
         "email": "example@xxx.com",
-        "phone": "1234567890",
+        "phone": 1234567890,
         "credit": 100,
         "balance": 100,
         "nickname":"xxx",
@@ -670,6 +670,23 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 ```
 
 ### Tasks
+
+#### Time Format
+
+The time string in JSON should be like this:
+
+```Java
+import java.time.Instant;
+Instant.now().toString();
+```
+
+> 2017-01-23T12:34:56.123456789Z
+
+Recover from string
+
+```Java
+Instant instant = Instant.parse( "2017-01-23T12:34:56.123456789Z" ); 
+```
 
 ####  1. Create a Task
 
