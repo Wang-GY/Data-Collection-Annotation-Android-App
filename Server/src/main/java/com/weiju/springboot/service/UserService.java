@@ -7,5 +7,5 @@ public interface UserService {
 
     User getUserProfile(int user_id);
 
-    User saveUser(User user);
+    User registerUser(String email, String password);
 }

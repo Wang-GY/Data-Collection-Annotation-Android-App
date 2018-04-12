@@ -17,7 +17,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User saveUser(User user) {
-        return null;
+    public User registerUser(String email, String password) {
+
+        User user = new User();
+        user.setEmail(email);
+        user.setHashed_password(hashPassword(password));
+
+        userRepository.save(user);
+        return user;
+
+    }
+
+    public String hashPassword(String password){
+        return password;
+
     }
 }
