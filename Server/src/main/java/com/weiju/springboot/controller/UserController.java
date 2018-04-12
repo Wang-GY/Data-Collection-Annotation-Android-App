@@ -1,18 +1,24 @@
 package com.weiju.springboot.controller;
 
 import com.weiju.springboot.model.User;
+import org.json.HTTP;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.weiju.springboot.service.UserService;
 
+import java.util.Iterator;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+    private final UserService userService;
+
     @Autowired
-    UserService userService;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     // 用户注册
     @PostMapping(value = "/")
@@ -42,5 +48,16 @@ public class UserController {
       user_info.put("data",new JSONObject(user));
       return user_info.toString();
 
+    }
+    //更新用户信息
+    @PatchMapping(value = "/{id}")
+    public String updateUserProfile(@PathVariable("id") int userid,@RequestBody Map<String,Map<String,Object>> payload){
+       JSONObject data = new JSONObject(payload.get("data"));
+       User user = new User();
+        Iterator iterator = data.keys();
+        while (iterator.hasNext()){
+            
+        }
+        return null;
     }
 }

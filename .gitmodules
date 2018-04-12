@@ -1,0 +1,3 @@
+[submodule "AndroidClient"]
+	path = AndroidClient
+	url = https://github.com/Peng-YM/AndroidClient.git

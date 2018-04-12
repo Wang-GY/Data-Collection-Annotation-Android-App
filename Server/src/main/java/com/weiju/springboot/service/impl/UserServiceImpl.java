@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import com.weiju.springboot.repository.UserRepository;
 import com.weiju.springboot.service.UserService;
 
+import javax.validation.constraints.Null;
+
 @Service("User Service")
 public class UserServiceImpl implements UserService {
 
@@ -28,7 +30,20 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    public String hashPassword(String password){
+    @Override
+    public Boolean verifyLogin(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        //TODO generate error
+        if (user== null){
+            return false;
+        }
+        else if (user.getHashed_password().equals(hashPassword(password))){
+            return true;
+        }
+        return false;
+    }
+
+    private String hashPassword(String password){
         return password;
 
     }
