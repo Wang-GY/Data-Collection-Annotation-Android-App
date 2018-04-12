@@ -1,6 +1,6 @@
-package repository;
+package com.weiju.springboot.repository;
 
-import model.User;
+import com.weiju.springboot.model.User;
 import org.springframework.data.repository.CrudRepository;
 
 public interface UserRepository extends CrudRepository<User, Integer>{

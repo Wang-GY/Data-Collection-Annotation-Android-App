@@ -1,7 +1,7 @@
-package service;
+package com.weiju.springboot.service;
 
 
-import model.User;
+import com.weiju.springboot.model.User;
 
 public interface UserService {
 

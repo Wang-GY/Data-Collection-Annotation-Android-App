@@ -1,9 +1,9 @@
-package controller;
+package com.weiju.springboot.controller;
 
-import model.User;
+import com.weiju.springboot.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import service.UserService;
+import com.weiju.springboot.service.UserService;
 
 import java.util.Map;
 

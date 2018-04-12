@@ -1,10 +1,10 @@
-package service.impl;
+package com.weiju.springboot.service.impl;
 
-import model.User;
+import com.weiju.springboot.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import repository.UserRepository;
-import service.UserService;
+import com.weiju.springboot.repository.UserRepository;
+import com.weiju.springboot.service.UserService;
 
 @Service("User Service")
 public class UserServiceImpl implements UserService {

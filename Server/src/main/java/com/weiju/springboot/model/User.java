@@ -1,4 +1,4 @@
-package model;
+package com.weiju.springboot.model;
 
 import javax.persistence.*;
 
