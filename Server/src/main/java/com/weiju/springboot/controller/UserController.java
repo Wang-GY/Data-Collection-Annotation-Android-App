@@ -1,9 +1,13 @@
 package com.weiju.springboot.controller;
 
+import com.weiju.springboot.exception.BaseException;
 import com.weiju.springboot.model.DataMetaErr;
 import com.weiju.springboot.model.User;
+import com.weiju.springboot.repository.UserRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.weiju.springboot.service.UserService;
 
@@ -13,20 +17,26 @@ import java.util.Map;
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserRepository userRepository) {
+
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     // 用户注册
     @PostMapping(value = "/")
 
-    public String userRegistration(@RequestBody Map<String, Map<String, Object>> payload) {
+    public ResponseEntity<String> userRegistration(@RequestBody Map<String, Map<String, Object>> payload) throws Exception {
 
         JSONObject data = new JSONObject(payload.get("data"));
         System.out.println(data.toString());
-
+        //check email-exist:
+        if (!userRepository.existsByEmail(data.getString("email"))) {
+            throw new BaseException("email already registered", HttpStatus.NOT_FOUND);
+        }
         User user = userService.registerUser(data.getString("email"), data.getString("password"));
 
         JSONObject user_info = new JSONObject();
@@ -37,7 +47,7 @@ public class UserController {
         JSONObject return_info = new JSONObject();
         return_info.put("data", user_info);
 
-        return return_info.toString();
+        return new ResponseEntity<>(return_info.toString(), HttpStatus.CREATED);
     }
 
     //获取用户信息
@@ -52,8 +62,9 @@ public class UserController {
 
     //更新用户信息
     @PatchMapping(value = "/{id}")
-    public DataMetaErr updateUserProfile(@PathVariable("id") int userid, @RequestBody DataMetaErr payload) {
-        User updated_user = userService.updateUser((Map<String, Object>)payload.getData());
+    public DataMetaErr updateUserProfile(@PathVariable("id") int userid, @RequestBody DataMetaErr payload) throws Exception {
+        Map<String, Object> user_data = (Map<String, Object>) payload.getData();
+        User updated_user = userService.updateUser(user_data);
         DataMetaErr user_info = new DataMetaErr();
         user_info.setData(updated_user);
         return user_info;

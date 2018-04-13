@@ -1,18 +1,19 @@
 package com.weiju.springboot.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.http.HttpStatus;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorInfo {
-    private Integer status;
+    private HttpStatus status;
     private String title;
     private String detail;
 
-    public Integer getStatus() {
+    public HttpStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(HttpStatus status) {
         this.status = status;
     }
 

@@ -118,11 +118,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 ```Json
 {
-    "errors": [{
+    "errors": {
         "title": "This is a short human readable msg, MUST not be empty",
         "detail": "This is human readable detail msg, can be empty",
         "status": 404
-    }]
+    }
 }
 ```
 
@@ -172,11 +172,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 ```Json
 {
-    "errors": [{
+    "errors": {
         "title": "This is a short human readable msg, MUST not be empty",
         "detail": "This is human readable detail msg, can be empty",
         "status": 404
-    }]
+    }
 }
 ```
 
@@ -232,11 +232,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - Body:
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "This email has already been registered",
         "detail": "can not insert into users,violate email unique constrain",
         "status": 404
-    }]
+    }
 }
 ```
 
@@ -289,11 +289,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 ```JSON
 
 {
-    "errors": [{
+    "errors": {
         "title": "email not registered",
         "detail": "can not find email in users",
         "status": 400
-    }]
+    }
 }
 
 ```
@@ -303,11 +303,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - Body
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "email password does not match",
         "detail": "email password does not match",
         "status": 400
-    }]
+    }
 }
 
 ```
@@ -341,10 +341,9 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
           "id": "xxx",
           "username": "xxx",
           "email": "example@xxx.com",
-          "phone": 1234567890,
+          "phone": "1234567890",
           "credit": 100,
           "balance": 100,
-          "nickname":"xxx",
           "level":0,
           "avatar":"URL",
           "register_date":"xxx",
@@ -363,11 +362,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - Body
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "No such user",
         "detail": "No such user",
         "status": 404
-    }]
+    }
 }
 ```
 - Permission denied
@@ -376,11 +375,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - Body
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "Please login",
         "detail": "Permission denied",
         "status": 401
-    }]
+    }
 }
 ```
 
@@ -445,11 +444,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - Body
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "Please login",
         "detail": "Permission denied",
         "status": 401
-    }]
+    }
 }
 ```
 
@@ -489,11 +488,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - Body
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "Please login",
         "detail": "Permission denied",
         "status": 401
-    }]
+    }
 }
 ```
 
@@ -505,11 +504,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 ```Json
 {
-    "errors": [{
+    "errors": {
         "title": "File not found",
         "detail": "File not found",
         "status": 404
-    }]
+    }
 }
 ```
 
@@ -587,11 +586,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - Body
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "Please login",
         "detail": "Permission denied",
         "status": 401
-    }]
+    }
 }
 ```
 
@@ -603,11 +602,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 ```Json
 {
-    "errors": [{
+    "errors": {
         "title": "File not found",
         "detail": "File not found",
         "status": 404
-    }]
+    }
 }
 ```
 
@@ -645,11 +644,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 - Body
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "Please login",
         "detail": "Permission denied",
         "status": 401
-    }]
+    }
 }
 ```
 
@@ -661,11 +660,11 @@ All exceptions should be mapped in an error payload. Here is an example how a JS
 
 ```Json
 {
-    "errors": [{
+    "errors": {
         "title": "File not found",
         "detail": "File not found",
         "status": 404
-    }]
+    }
 }
 ```
 
@@ -685,7 +684,7 @@ Instant.now().toString();
 Recover from string
 
 ```Java
-Instant instant = Instant.parse( "2017-01-23T12:34:56.123456789Z" ); 
+Instant instant = Instant.parse( "2017-01-23T12:34:56.123456789Z" );
 ```
 
 ####  1. Create a Task
@@ -735,11 +734,11 @@ TODO: XML standard (URL of pictures,task labels)
 - Body
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "Please login",
         "detail": "Permission denied",
         "status": 401
-    }]
+    }
 }
 ```
 
@@ -751,11 +750,11 @@ TODO: XML standard (URL of pictures,task labels)
 
 ```Json
 {
-    "errors": [{
+    "errors": {
         "title": "File not found",
         "detail": "picture url not exists",
         "status": 404
-    }]
+    }
 }
 ```
 
@@ -814,11 +813,11 @@ Init task window.
 - Body
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "No such task",
         "detail": "No such task",
         "status": 404
-    }]
+    }
 }
 ```
 - Permission denied
@@ -827,11 +826,11 @@ Init task window.
 - Body
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "Please login",
         "detail": "Permission denied",
         "status": 401
-    }]
+    }
 }
 ```
 
@@ -896,11 +895,11 @@ Init task window.
 - Body
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "Please login",
         "detail": "Permission denied",
         "status": 401
-    }]
+    }
 }
 ```
 
@@ -933,7 +932,7 @@ Finish a subtask and upload.
           "result":[
               {
                  "picture_url": "uuid",
-          		"xml": "xxx" 
+          		"xml": "xxx"
               }
           ]
       }
@@ -955,11 +954,11 @@ Finish a subtask and upload.
 - Body
 ```JSON
 {
-    "errors": [{
+    "errors": {
         "title": "Please login",
         "detail": "Permission denied",
         "status": 401
-    }]
+    }
 }
 ```
 
@@ -1013,10 +1012,10 @@ Finish a subtask and upload.
 
 ```Json
 {
-    "errors": [{
+    "errors": {
         "title": "You haven't take this task",
         "detail": "can not find commits of this task",
         "status": 404
-    }]
+    }
 }
 ```

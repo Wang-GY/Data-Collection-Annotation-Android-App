@@ -20,8 +20,8 @@ public class User {
     @Column(name = "hashed_password")
     private String hashed_password;
 
-    @Column(name = "nick_name")
-    private String nike_name;
+    @Column(name = "username")
+    private String username;
 
     @Column(name = "gender")
     private int gender;
@@ -57,8 +57,8 @@ public class User {
         return hashed_password;
     }
 
-    public String getNike_name() {
-        return nike_name;
+    public String getUsername() {
+        return username;
     }
 
     public int getGender() {
@@ -103,8 +103,8 @@ public class User {
         this.hashed_password = hashed_password;
     }
 
-    public void setNike_name(String nike_name) {
-        this.nike_name = nike_name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setGender(int gender) {

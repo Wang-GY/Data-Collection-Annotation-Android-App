@@ -1,15 +1,12 @@
 package com.weiju.springboot.service.impl;
 
 import com.weiju.springboot.model.User;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import com.weiju.springboot.repository.UserRepository;
 import com.weiju.springboot.service.UserService;
 
-import javax.validation.constraints.Null;
-import java.util.Iterator;
 import java.util.Map;
 
 @Service("User Service")
@@ -68,7 +65,7 @@ public class UserServiceImpl implements UserService {
                     user.setAvatar((String) user_info.get(key));
                     break;
                 case "nick_name":
-                    user.setNike_name((String) user_info.get(key));
+                    user.setUsername((String) user_info.get(key));
                     break;
 
             }
