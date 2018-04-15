@@ -708,7 +708,22 @@ TODO: XML standard (URL of pictures,task labels)
   {
       "data": {
           "id": "uuid",
-          "xml": "xxxx",
+          "formater": {
+            "tags":[
+                {
+                  "nsme":"tag1",
+                  "description":"some description about tag1",
+                  "attributes":[
+                    {
+                      "name":"attr1",
+                      "description":"some description about attr1",
+                      "values":["option1","option2"]
+                    }
+                  ]
+                }
+            ]
+
+          },
           "title": "xxx",
           "start": "xxxx",
           "end": "xxx",
@@ -717,6 +732,10 @@ TODO: XML standard (URL of pictures,task labels)
   }
   ```
 
+  formater:
+  1. APP对输入的属性取值(Json中的values字段)**不做类型区分**，一律存成String。
+  2. 属性的values字段设置为空表示可以任意取值。否则标注用户只能从中选择(一个或者多个)。
+  3. 由于标注方式太灵活，每个标签和属性均需要提供description字段用于指导用户如何进行标注。
 
 **Response:**
 
@@ -758,12 +777,58 @@ TODO: XML standard (URL of pictures,task labels)
 }
 ```
 
-####  2. Get Pictures Related to a Tasks
+####  2. Get Pictures Related to a Task
 
 The links of the pictures should be contained in the xml file of the task.
-#### 3. *Get tasks id multiple*
+#### 3. Get tasks id multiple
 Init task window.
 初始化界面时可能会需要请求任务信息，后端返回任务id，需要完善。
+
+**Request:**
+- URI
+```HTTP
+GET /aop/v1/tasks?limit=10
+```
+
+**Response:**
+- Status code: 200
+- Body
+
+```json
+{
+  "meta":{
+  "result_set":{
+    "total":100,
+    "count":10,
+    "next":"...&offset=10"
+  }
+  },
+  "data":{
+    "tasks":[
+      {
+          "id": 1,
+          "name": "xxx",
+          "description": "xxx",
+          "start_time": "1234567890",
+          "type": 0,
+          "size": 100,
+          "data_path":"xxx",
+          "creater":0,
+          "progress":20,
+          "pictures":["url1","url2"],
+          "formater":{}
+      }
+    ]
+
+  }
+}
+```
+pictures: 提供最多10张此任务的图片方便前端预览
+pictures 不是tasks 表中的列
+
+Also support /api/v1/tasks?task_id={task_id}
+meta 如果"offset=10"中加"prev":"...&offset=0"
+见 https://developer.digitalchalk.com/document/rest-api-v5/limit-and-offset/
 ####  4. Get task Profiles
 
 **Description:**
@@ -773,7 +838,7 @@ Init task window.
 - URI
 
   ```http
-  GET /api/v1/tasks/{task_id}
+  GET /api/v1/tasks/task_id=1
   ```
 
 
@@ -789,9 +854,9 @@ Init task window.
 - Body
 
   ```Json
-  {   "meta":{"label number":5},
+  {   
       "data": {
-          "id": "xxx",
+          "id": 1,
           "name": "xxx",
           "description": "xxx",
           "start_time": "1234567890",
@@ -800,7 +865,8 @@ Init task window.
           "data_path":"xxx",
           "creater":0,
           "progress":20,
-          "labels":["label1","label2","label3..."]
+          "pictures":["url1","url2"],
+          "formater":{}
       }
   }
   ```
@@ -834,7 +900,7 @@ Init task window.
 }
 ```
 
-####  5. ~~Update task Profiles~~
+####  5. Update task Profiles
 
 **Description:**
 
@@ -862,7 +928,7 @@ Init task window.
       }
   }
   ```
-
+要检查{id}和"id"是否一致，不能更新id
 
 **Response:**
 
@@ -870,7 +936,7 @@ Init task window.
 
 - Body
 ```Json
-{   "meta":{"label number":5},
+{    
     "data": {
         "id": "xxx",
         "type": "task",
@@ -882,7 +948,7 @@ Init task window.
         "data_path":"xxx",
         "creater":0,
         "progress":20,
-        "labels":["label1","label2","label3..."]
+        "formater":{}
     }
 }
 ```
@@ -902,12 +968,30 @@ Init task window.
     }
 }
 ```
+#### 6. Apply  a task
 
+**Description:**
+申请一个任务，后端发放一部分数据
+**Request:**
+- URI
+```http
+POST /api/tasks/apply
+```
+- Body
+```JSON
+{
+  "data":{
+    "taskid":1,
+    "applyer":0
+  }
+}
+```
+applyer: userid
 
 
 ### Commits
 
-####  1. Upload a commit
+####  ~~1. Upload a commit~~
 
 **Description:**
 Finish a subtask and upload.
@@ -926,19 +1010,42 @@ Finish a subtask and upload.
   ```Json
   {
       "data": {
-          "id": "commit_id",
-          "task_id":"uuid",
-          "author_id": "uuid",
+          "id": 0,
+          "task_id": 1,
+          "commiter": 1,
           "result":[
               {
-                 "picture_url": "uuid",
-          		"xml": "xxx"
+                 "picture_url": "URL",
+          		   "xml": "xxx"
               }
           ]
       }
   }
   ```
-
+xxx:
+```json
+{
+    "tags": [
+        {
+            "name": "tag1",
+            "position": [
+                [0, 0],
+                [100, 100]
+            ]
+            "attributes": [
+                {
+                    "name": "attr1",
+                    "values": ["option1", "option2"]
+                }
+            ]
+        }
+    ]
+}
+```
+1. position字段指定标签的位置。
+   - 框图标注：提供左上角，右下角坐标。
+   - 点标注(Optional): 提供所有点坐标。
+2. APP对用户的输入字段**不做检查**。将处理过程交给任务发布方或者管理员。
 
 **Response:**
 
@@ -971,7 +1078,7 @@ Finish a subtask and upload.
 - URI
 
   ```http
-  GET /api/commits?user={user_id}&task={task_id}
+  GET /api/commits?user={user_id}&task={task_id}&limit=3
   ```
 
 
@@ -987,20 +1094,38 @@ Finish a subtask and upload.
 - Body
 
   ```Json
-  {
+  {   
+    "meta":{
+
+       "result_set": {
+               "count": 3,
+               "offset": 0,
+               "limit": 3,
+               "total": 77,
+               "next":"/api/commits?user={user_id}&task={task_id}&limit=3&offset=3"
+           }
+       },
+
       "data": {
-          "id": "commit_id",
-          "task_id": "uuid",
-          "author_id": "uuid",
+        "commits":[
+          {
+          "id": 0,
+          "task_id": 2,
+          "author_id": 1,
           "result": [
               {
-                	"picture_url": "uuid",
-          		"xml": "xxx"  
+                	 "picture_url": "url",
+          		     "xml": "url"  
               }
-          ]
+                  ]
+          }
+
+      ]
       }
   }
   ```
+  备注：
+  如果下一次请求这个offset=3,在meta中加上"prev"=".....&offset=0"
 
 **Errors:**
 
