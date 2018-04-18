@@ -30,8 +30,8 @@ public class Task {
     private String data_path;
 
     @ManyToOne(cascade = CascadeType.REFRESH, targetEntity = User.class)
-    @JoinColumn(name = "creater", referencedColumnName = "userid")
-    private int creater;
+    @JoinColumn(name = "creator", referencedColumnName = "userid")
+    private int creator;
 
     @Column(name = "progress")
     private String progress;
@@ -39,12 +39,12 @@ public class Task {
     @Column(name = "formater")
     private String formater;
 
-    public void setCreater(int creater) {
-        this.creater = creater;
+    public void setCreator(int creator) {
+        this.creator = creator;
     }
 
-    public int getCreater() {
-        return creater;
+    public int getCreator() {
+        return creator;
     }
 
     public String getName() {

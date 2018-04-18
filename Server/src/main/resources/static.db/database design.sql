@@ -57,12 +57,12 @@ CREATE TABLE IF NOT EXISTS `data_collection_annotation_app`.`tasks` (
   `type` INT(1) NOT NULL,
   `size` INT(11) NOT NULL COMMENT '图片数量',
   `data_path` VARCHAR(45) NULL DEFAULT NULL COMMENT '数据存放路径\n数据包括：图片、每张图片对应的xm\'l、任务的标签文件（xml）',
-  `creater` INT(11) NOT NULL,
+  `creator` INT(11) NOT NULL,
   `progress` VARCHAR(45) NULL DEFAULT NULL COMMENT '任务完成进度（完成数据数量）',
   PRIMARY KEY (`taskid`),
-  INDEX `to_user_idx` (`creater` ASC),
+  INDEX `to_user_idx` (`creator` ASC),
   CONSTRAINT `to user`
-    FOREIGN KEY (`creater`)
+    FOREIGN KEY (`creator`)
     REFERENCES `data_collection_annotation_app`.`users` (`userid`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)

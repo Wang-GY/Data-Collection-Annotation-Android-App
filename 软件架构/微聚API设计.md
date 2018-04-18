@@ -813,7 +813,7 @@ GET /aop/v1/tasks?limit=10
           "type": 0,
           "size": 100,
           "data_path":"xxx",
-          "creater":0,
+          "creator":0,
           "progress":20,
           "pictures":["url1","url2"],
           "formater":{}
@@ -863,7 +863,7 @@ meta 如果"offset=10"中加"prev":"...&offset=0"
           "type": 0,
           "size": 100,
           "data_path":"xxx",
-          "creater":0,
+          "creator":0,
           "progress":20,
           "pictures":["url1","url2"],
           "formater":{}
@@ -946,7 +946,7 @@ meta 如果"offset=10"中加"prev":"...&offset=0"
         "type": 0,
         "size": 100,
         "data_path":"xxx",
-        "creater":0,
+        "creator":0,
         "progress":20,
         "formater":{}
     }

@@ -47,8 +47,8 @@ public class User {
     @Column(name = "balance")
     private int balance;
 
-    //TODO rename creater to creator
-    @OneToMany(mappedBy = "creater", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Task.class)
+
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Task.class)
     private List<Task> tasks; // user tasks
 
     public List<Task> getTasks() {
