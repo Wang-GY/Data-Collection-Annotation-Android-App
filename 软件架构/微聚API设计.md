@@ -725,8 +725,8 @@ TODO: XML standard (URL of pictures,task labels)
 
           },
           "title": "xxx",
-          "start": "xxxx",
-          "end": "xxx",
+          "start_time": "xxxx",
+          "deadline": "xxx",
           "descriptions": "xxx"
       }
   }
@@ -816,6 +816,7 @@ GET /aop/v1/tasks?limit=10
           "creator":0,
           "progress":20,
           "pictures":["url1","url2"],
+          "deadline": "xxx",
           "formater":{}
       }
     ]
@@ -866,6 +867,7 @@ meta 如果"offset=10"中加"prev":"...&offset=0"
           "creator":0,
           "progress":20,
           "pictures":["url1","url2"],
+          "deadline": "xxx",
           "formater":{}
       }
   }
@@ -948,6 +950,7 @@ meta 如果"offset=10"中加"prev":"...&offset=0"
         "data_path":"xxx",
         "creator":0,
         "progress":20,
+        "deadline": "xxx",
         "formater":{}
     }
 }
