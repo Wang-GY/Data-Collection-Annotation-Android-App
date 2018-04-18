@@ -3,18 +3,21 @@ package com.weiju.springboot.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
+
 
     @Id
     @Column(name = "userid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private int userid;
 
-    @Column(name="email")
+    @Column(name = "email")
     private String email;
 
     @Column(name = "hashed_password")
@@ -29,13 +32,13 @@ public class User {
     @Column(name = "register_date")
     private String register_date;
 
-    @Column(name="level")
+    @Column(name = "level")
     private int level;
 
-    @Column(name="phone")
+    @Column(name = "phone")
     private String phone;
 
-    @Column(name="avatar")
+    @Column(name = "avatar")
     private String avatar; //url for avatar
 
     @Column(name = "privilege")
@@ -43,6 +46,14 @@ public class User {
 
     @Column(name = "balance")
     private int balance;
+
+    //TODO rename creater to creator
+    @OneToMany(mappedBy = "creater", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Task.class)
+    private List<Task> tasks; // user tasks
+
+    public List<Task> getTasks() {
+        return tasks;
+    }
 
 
     public int getUserid() {
@@ -88,7 +99,6 @@ public class User {
     public int getBalance() {
         return balance;
     }
-
 
 
     public void setUserid(int userid) {

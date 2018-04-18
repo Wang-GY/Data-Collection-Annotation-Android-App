@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `data_collection_annotation_app`.`users` (
   `userid` INT(11) NOT NULL AUTO_INCREMENT,
   `email` VARCHAR(255) NOT NULL,
   `hashed_password` VARCHAR(255) NOT NULL,
-  `nick_name` VARCHAR(255) NULL DEFAULT NULL,
+  `username` VARCHAR(255) NULL DEFAULT NULL,
   `gender` INT(1) NULL DEFAULT NULL COMMENT '0:female\n1:male',
   `register_date` DATETIME NULL DEFAULT NULL,
   `level` INT(1) NOT NULL DEFAULT '0',
@@ -36,7 +36,9 @@ CREATE TABLE IF NOT EXISTS `data_collection_annotation_app`.`users` (
   `privilege` INT(1) NOT NULL DEFAULT '0' COMMENT '0:finish task\n1:create task',
   `credit` INT(11) NULL DEFAULT NULL,
   `balance` INT(11) NULL DEFAULT NULL,
+  UNIQUE INDEX `email_unique_idx` (`email` ASC),
   PRIMARY KEY (`userid`))
+
 ENGINE = InnoDB
 AUTO_INCREMENT = 11
 DEFAULT CHARACTER SET = utf8;
