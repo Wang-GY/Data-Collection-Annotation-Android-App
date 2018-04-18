@@ -29,7 +29,8 @@ public class Task {
     @Column(name = "data_path")
     private String data_path;
 
-    @Column(name = "creater")
+    @ManyToOne(cascade = CascadeType.REFRESH, targetEntity = User.class)
+    @JoinColumn(name = "creater", referencedColumnName = "userid")
     private int creater;
 
     @Column(name = "progress")

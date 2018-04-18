@@ -5,4 +5,4 @@ spring:
     datasource:
       url: jdbc:mysql://localhost:3306/data_collection_annotation_app
       username: root
-      password: wang1207
+      password: wang1207 #注意格式
