@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
@@ -24,10 +26,12 @@ public class FileServiceImpl implements FileService {
     @Override
     public void init(Path path) throws BaseException {
         try {
-            Files.createDirectory(path);
-
+            Files.createDirectories(path);
+        } catch (FileAlreadyExistsException e1) {
+            System.out.println("already exist");
         } catch (IOException e) {
             throw new BaseException("Could not initlize storage", HttpStatus.INTERNAL_SERVER_ERROR, e);
+
 
         }
     }
@@ -39,12 +43,14 @@ public class FileServiceImpl implements FileService {
      * output: /xxx/newFilename
      */
     @Override
-    public void store(MultipartFile file, Path path, String newFilename) throws BaseException {
+    public URL store(MultipartFile file, Path path, String newFilename) throws BaseException {
         try {
             if (file.isEmpty()) {
                 throw new BaseException("Failed to store empty file" + file.getOriginalFilename(), HttpStatus.NOT_FOUND);
             }
+            init(path);
             Files.copy(file.getInputStream(), path.resolve(newFilename));
+            return path.resolve(newFilename).toUri().toURL();
         } catch (IOException e) {
             throw new BaseException("Failed to store file" + file.getOriginalFilename(), HttpStatus.NOT_FOUND);
         }

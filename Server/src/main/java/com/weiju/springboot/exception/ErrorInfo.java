@@ -5,16 +5,16 @@ import org.springframework.http.HttpStatus;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorInfo {
-    private HttpStatus status;
+    private int status;
     private String title;
     private String detail;
 
-    public HttpStatus getStatus() {
+    public int getStatus() {
         return status;
     }
 
     public void setStatus(HttpStatus status) {
-        this.status = status;
+        this.status = status.value();
     }
 
     public String getTitle() {
@@ -32,8 +32,6 @@ public class ErrorInfo {
     public void setDetail(String detail) {
         this.detail = detail;
     }
-
-
 
 
 }

@@ -23,6 +23,7 @@ public class GlobalExceptionHandler {
         r.setStatus(e.getStatus());
         r.setTitle(e.getMessage());
         ResponseEntity responseEntity = new ResponseEntity(r, e.getStatus());
+        e.printStackTrace();
         return responseEntity;
     }
 }
