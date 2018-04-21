@@ -727,10 +727,16 @@ TODO: XML standard (URL of pictures,task labels)
           "title": "xxx",
           "start_time": "xxxx",
           "deadline": "xxx",
-          "descriptions": "xxx"
+          "descriptions": "xxx",
+          "type":0
       }
   }
   ```
+  
+  type:  
+  0: 标注
+  1: 采集  
+  
 
   formater:
   1. APP对输入的属性取值(Json中的values字段)**不做类型区分**，一律存成String。
@@ -1013,7 +1019,7 @@ Finish a subtask and upload.
   ```Json
   {
       "data": {
-          "id": 0,
+          "task_type":0
           "task_id": 1,
           "commiter": 1,
           "result":[
@@ -1024,7 +1030,9 @@ Finish a subtask and upload.
           ]
       }
   }
-  ```
+  ```  
+
+
 xxx:
 ```json
 {
@@ -1049,6 +1057,7 @@ xxx:
    - 框图标注：提供左上角，右下角坐标。
    - 点标注(Optional): 提供所有点坐标。
 2. APP对用户的输入字段**不做检查**。将处理过程交给任务发布方或者管理员。
+3. 若task_type为1(采集任务)，则需要上传数据和json，*如何设计*？
 
 **Response:**
 
