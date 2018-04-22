@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.time.Instant;
 
 
 @RestController
@@ -36,7 +37,7 @@ public class PictureController {
     public ResponseEntity<Resource> getPicture(@PathVariable("picture_url") String picture_url) throws BaseException {
         System.out.println(picture_url);
         try {
-            UrlResource resource = new FileUrlResource("D:/data/"+picture_url);
+            UrlResource resource = new FileUrlResource(getNewPicturePath(picture_url));
             ResponseEntity responseEntity = new ResponseEntity(resource, HttpStatus.OK);
             return responseEntity;
         } catch (MalformedURLException e) {
@@ -49,10 +50,20 @@ public class PictureController {
     @PostMapping(value = "")
     public ResponseEntity<String> uploadPicture(@RequestParam("file") MultipartFile file, @RequestParam("task_id") String task_id) throws BaseException {
         Path filepath = fileProperties.getTaskPicturePath(Integer.valueOf(task_id));
-        // TODO generate new filename
-        URL url = fileService.store(file, filepath, file.getOriginalFilename());
+        // TODO
+        String new_name = getNewFilename(file, task_id);
+        URL url = fileService.store(file, filepath, new_name);
 
-        return new ResponseEntity<String>(url.toString(), HttpStatus.OK);
+        return new ResponseEntity<String>(new_name, HttpStatus.OK);
+    }
+
+    private String getNewFilename(MultipartFile file, String task_id) {
+        return task_id + "-" + Instant.now().toString().replace(":","-") + file.getOriginalFilename();
+    }
+
+    private String getNewPicturePath(String new_file_name) {
+        String[] sp = new_file_name.split("-");
+        return fileProperties.getTaskPicturePath(Integer.valueOf(sp[0])).resolve(new_file_name).toString();
     }
 
 
