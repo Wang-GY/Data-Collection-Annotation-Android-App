@@ -708,10 +708,10 @@ TODO: XML standard (URL of pictures,task labels)
   {
       "data": {
           "id": "uuid",
-          "formater": {
+          "formatter": {
             "tags":[
                 {
-                  "nsme":"tag1",
+                  "name":"tag1",
                   "description":"some description about tag1",
                   "attributes":[
                     {
@@ -738,7 +738,7 @@ TODO: XML standard (URL of pictures,task labels)
   1: 采集  
   
 
-  formater:
+  formatter:
   1. APP对输入的属性取值(Json中的values字段)**不做类型区分**，一律存成String。
   2. 属性的values字段设置为空表示可以任意取值。否则标注用户只能从中选择(一个或者多个)。
   3. 由于标注方式太灵活，每个标签和属性均需要提供description字段用于指导用户如何进行标注。
