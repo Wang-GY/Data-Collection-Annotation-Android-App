@@ -9,3 +9,4 @@ spring:
       # url: jdbc:mysql://206.189.35.98:3306/data_collection_annotation_app
       # username: weiju
       # password: 123456 #注意格式
+

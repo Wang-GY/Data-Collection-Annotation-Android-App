@@ -6,8 +6,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import javax.print.attribute.standard.Media;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -48,6 +50,8 @@ public class FileProperties {
         return getTaskDataPath(taskid).resolve("pictures");
 
     }
+
+
 
 
 }

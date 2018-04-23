@@ -9,15 +9,22 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
+
+import static org.springframework.http.MediaType.IMAGE_JPEG;
+import static org.springframework.http.MediaType.IMAGE_PNG;
 
 
 @RestController
@@ -38,11 +45,17 @@ public class PictureController {
         System.out.println(picture_url);
         try {
             UrlResource resource = new FileUrlResource(getNewPicturePath(picture_url));
-            ResponseEntity responseEntity = new ResponseEntity(resource, HttpStatus.OK);
-            return responseEntity;
+            String contentType = Files.probeContentType(Paths.get(getNewPicturePath(picture_url)));
+            String[] base_sub = contentType.split("/");
+            String type = base_sub[0];
+            String subtype = base_sub[1];
+            return ResponseEntity.ok().contentType(new MediaType(type, subtype)).body(resource);
         } catch (MalformedURLException e) {
             throw new BaseException("File not found", HttpStatus.NOT_FOUND);
 
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new BaseException("IO exception", HttpStatus.NOT_FOUND);
         }
 
     }
@@ -58,7 +71,7 @@ public class PictureController {
     }
 
     private String getNewFilename(MultipartFile file, String task_id) {
-        return task_id + "-" + Instant.now().toString().replace(":","-") + file.getOriginalFilename();
+        return task_id + "-" + Instant.now().toString().replace(":", "-") + file.getOriginalFilename();
     }
 
     private String getNewPicturePath(String new_file_name) {
