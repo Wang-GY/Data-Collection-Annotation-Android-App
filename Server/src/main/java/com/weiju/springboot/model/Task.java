@@ -17,7 +17,7 @@ public class Task {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "start_name")
+    @Column(name = "start_time")
     private String start_time; //WHY don't use DATETIME OF MYSQL
 
     @Column(name = "type")

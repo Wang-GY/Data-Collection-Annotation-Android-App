@@ -15,6 +15,7 @@ import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.stream.Stream;
 
 /**
@@ -90,5 +91,10 @@ public class FileServiceImpl implements FileService {
     @Override
     public void deleteAll(Path path) {
         FileSystemUtils.deleteRecursively(path.toFile());
+    }
+
+    @Override
+    public String getNewfilename(String oldfilename) {
+        return Instant.now().toString().replace(":", "-") + oldfilename;
     }
 }

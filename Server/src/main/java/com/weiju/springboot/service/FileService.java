@@ -26,4 +26,6 @@ public interface FileService {
 
 
     void deleteAll(Path path);
+
+    String getNewfilename(String oldfilename);
 }
