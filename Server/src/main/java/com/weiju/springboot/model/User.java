@@ -51,6 +51,15 @@ public class User {
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Task.class)
     private List<Task> tasks; // user tasks
 
+    //mappedBy : model 层定义的变量，不是数据库的字段
+    @OneToMany(mappedBy = "commiterId", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Commit.class)
+    private List<Commit> commits;
+
+
+    public List<Commit> getCommits() {
+        return commits;
+    }
+
     public List<Task> getTasks() {
         return tasks;
     }
