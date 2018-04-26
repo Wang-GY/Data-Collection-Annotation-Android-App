@@ -39,6 +39,9 @@ public class Task {
     @Column(name = "formater")
     private String formater;
 
+    @Column(name = "deadline")
+    private String deadline;
+
     public void setCreator(int creator) {
         this.creator = creator;
     }
@@ -118,4 +121,13 @@ public class Task {
     public int getSize() {
         return size;
     }
+
+    public void setDeadline(String deadline) {
+        this.deadline = deadline;
+    }
+
+    public String getDeadline() {
+        return deadline;
+    }
+
 }

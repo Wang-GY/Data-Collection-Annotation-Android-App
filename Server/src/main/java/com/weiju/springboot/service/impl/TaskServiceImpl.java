@@ -19,13 +19,23 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task createTask(String formater, String title, String start, String end, String description) {
-        return null;
+    public Task createTask(int uuid, String formater, String title, String start_time, String deadline,
+        String description, int type) {
+        Task task = new Task();
+        task.setFormater(formater);
+        task.setName(title);
+        task.setCreator(uuid);
+        task.setStart_time(start_time);
+        task.setDeadline(deadline);
+        task.setDescription(description);
+        task.setType(type);
+        taskRepository.save(task);
+        return task;
     }
 
     @Override
     public Task getTaskProfile(int id) {
-        return null;
+        return taskRepository.findByTaskid(id);
     }
 
     @Override
