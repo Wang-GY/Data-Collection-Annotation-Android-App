@@ -3,6 +3,8 @@ package com.weiju.springboot.service.impl;
 import com.weiju.springboot.model.Task;
 import com.weiju.springboot.repository.TaskRepository;
 import com.weiju.springboot.service.TaskService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.Map;
@@ -39,17 +41,28 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task updateTaskProfile(Map<Integer, Object> task_info) {
-        return null;
+    public Task updateTaskProfile(int taskid, String formater) {
+        Task task = getTaskProfile(taskid);
+        if (task == null) {
+            return null;
+        }
+        task.setFormater(formater);
+        taskRepository.save(task);
+        return task;
     }
 
     @Override
-    public Iterable<Task> getTasks() {
-        return null;
+    public Iterable<Task> getTasks(int offset, int limit) {
+        Pageable pageable = new PageRequest(offset, limit);
+        return taskRepository.findAll(pageable);
     }
 
     @Override
     public int applyTask(int taskid, int applyer) {
+        Task task = getTaskProfile(taskid);
+        if (task == null) {
+            return -1;
+        }
         return 0;
     }
 }
