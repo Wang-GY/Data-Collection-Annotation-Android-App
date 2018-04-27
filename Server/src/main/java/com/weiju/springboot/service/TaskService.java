@@ -3,7 +3,7 @@ package com.weiju.springboot.service;
 import com.weiju.springboot.model.Task;
 import org.springframework.stereotype.Service;
 
-@Service
+
 public interface TaskService {
 
     public Task createTask(int uuid, String formater, String title, String start, String deadline, String description, int type);

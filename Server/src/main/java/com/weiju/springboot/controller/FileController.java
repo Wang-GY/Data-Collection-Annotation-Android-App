@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
@@ -23,7 +24,7 @@ public class FileController {
     private static Logger logger = LoggerFactory.getLogger(FileController.class);
     private final FileService fileService;
     private final String BASE_PATH = Paths.get(".").toAbsolutePath().toString();
-    private final String TMP_PATH = "/Data/temp";
+    private final String TMP_PATH = "/src/main/resources/static";
 
     @Autowired
     public FileController(FileService fileService) {
@@ -40,8 +41,9 @@ public class FileController {
             while (iterator.hasNext()) {
                 MultipartFile file = (MultipartFile) iterator.next();
                 String newFilename = fileService.getNewfilename(file.getOriginalFilename());
-                fileService.store(file, path, newFilename);
+                URL url = fileService.store(file, path, newFilename);
                 logger.info("stored");
+                logger.info(url.toString());
             }
 
         } catch (BaseException e) {
