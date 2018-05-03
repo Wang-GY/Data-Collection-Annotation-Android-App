@@ -5,6 +5,7 @@ import com.weiju.springboot.repository.TaskRepository;
 import com.weiju.springboot.service.TaskService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -24,8 +25,19 @@ public class TaskController {
 
     //TODO
     @PostMapping("/")
-    public @ResponseBody String createTask(@RequestBody Map<String, Map<String, Object>> payload) {
-        return null;
+    public HttpStatus createTask(@RequestBody Map<String, Map<String, Object>> payload) {
+        JSONObject data = new JSONObject(payload.get("data"));
+        int uuid = Integer.parseInt(data.getString("uuid"));
+        String formatter = data.getString("formatter");
+        String title  = data.getString("title");
+        String start_time = data.getString("start_time");
+        String deadline = data.getString("deadline");
+        String description = data.getString("description");
+        int type = Integer.parseInt(data.getString("type"));
+
+        taskService.createTask(uuid, formatter, title, start_time, deadline, description, type);
+
+        return HttpStatus.OK;
     }
 
     //TODO
@@ -35,6 +47,17 @@ public class TaskController {
     }
 
     //TODO
+    @GetMapping("/")
+    public String getTaskById(@RequestParam(value = "task_id", required = true) String task_id) {
+        return null;
+    }
+
+    //TODO
+    @PatchMapping("/{id}")
+    public String updateTask(@PathVariable(value = "id") String id) {
+        return null;
+    }
+
 
 
 }
