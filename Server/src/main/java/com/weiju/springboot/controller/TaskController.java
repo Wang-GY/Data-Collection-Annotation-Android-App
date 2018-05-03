@@ -23,7 +23,7 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    //TODO
+
     @PostMapping("/")
     public HttpStatus createTask(@RequestBody Map<String, Map<String, Object>> payload) {
         JSONObject data = new JSONObject(payload.get("data"));
@@ -40,22 +40,36 @@ public class TaskController {
         return HttpStatus.OK;
     }
 
-    //TODO
+
     @GetMapping("/")
-    public Iterable<Task> getTasks(@RequestParam Map<String, Integer> requestParams) {
-        return null;
+    public Iterable<Task> getTasks(@RequestParam Map<String, String> requestParams) {
+        int offset = Integer.parseInt(requestParams.get("offset"));
+        int limit = Integer.parseInt(requestParams.get("limit"));
+
+        Iterable<Task> tasks = taskService.getTasks(offset, limit);
+        return tasks;
     }
 
-    //TODO
     @GetMapping("/")
     public String getTaskById(@RequestParam(value = "task_id", required = true) String task_id) {
-        return null;
+        return taskService.getTaskProfile(Integer.parseInt(task_id)).toString();
     }
 
-    //TODO
     @PatchMapping("/{id}")
-    public String updateTask(@PathVariable(value = "id") String id) {
-        return null;
+    public String updateTask(@PathVariable(value = "id") String id,
+        @RequestBody Map<String, Map<String, Object>> payload) {
+        JSONObject data = new JSONObject(payload.get("data"));
+        int idI = Integer.parseInt(data.getString("id"));
+        if (Integer.parseInt(id) != idI) {
+            return null;
+        }
+
+        int size = Integer.parseInt(data.getString("size"));
+
+        taskService.updateTaskProfile(idI, data.getString("name"),
+            data.getString("description"), size);
+
+        return taskService.getTaskProfile(idI).toString();
     }
 
 
