@@ -12,5 +12,9 @@ spring:
 
     resources:
         chain:
+          strategy:
+            content:
+              enabled: true
+
           enabled: true
           cache: true

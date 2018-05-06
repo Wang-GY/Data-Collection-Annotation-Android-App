@@ -35,7 +35,7 @@ public class FileController {
     private static Logger logger = LoggerFactory.getLogger(FileController.class);
     private final FileService fileService;
     private final String BASE_PATH = Paths.get(".").toAbsolutePath().toString();
-    private final String DATA_PATH = "/data/temp";
+    private final String DATA_PATH = "";
     private final String TMP_PATH = "/src/main/resources/static" + DATA_PATH;
     private final Environment environment; // 监听应用的ip:port
 
