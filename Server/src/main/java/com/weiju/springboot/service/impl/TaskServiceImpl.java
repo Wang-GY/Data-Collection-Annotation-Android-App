@@ -43,19 +43,22 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task updateTaskProfile(int taskid, String formater) {
+    public Task updateTaskProfile(int taskid, String name, String description, int size) {
         Task task = getTaskProfile(taskid);
         if (task == null) {
             return null;
         }
-        task.setFormater(formater);
+        task.setName(name);
+        task.setDescription(description);
+        task.setSize(size);
         taskRepository.save(task);
         return task;
     }
 
     @Override
     public Iterable<Task> getTasks(int offset, int limit) {
-        Pageable pageable = new PageRequest(offset, limit);
+        //Pageable pageable = new PageRequest(offset, limit);
+        Pageable pageable = PageRequest.of(offset, limit);
         return taskRepository.findAll(pageable);
     }
 

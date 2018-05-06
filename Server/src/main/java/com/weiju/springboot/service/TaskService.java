@@ -10,7 +10,7 @@ public interface TaskService {
 
     public Task getTaskProfile(int id);
 
-    public Task updateTaskProfile(int taskid, String formater);
+    public Task updateTaskProfile(int taskid, String name, String description, int size);
 
     public Iterable<Task> getTasks(int offset, int limit);
 
