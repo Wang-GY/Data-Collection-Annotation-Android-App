@@ -5,6 +5,7 @@ import com.weiju.springboot.service.FileService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,7 @@ import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.stream.Stream;
 
@@ -55,6 +57,21 @@ public class FileServiceImpl implements FileService {
         } catch (IOException e) {
             throw new BaseException("Failed to store file" + file.getOriginalFilename(), HttpStatus.NOT_FOUND);
         }
+    }
+
+    /**
+     * 根据文件路径+文件名，获取文件的MediaType
+     * @param filePath
+     * @return
+     * @throws IOException
+     */
+    @Override
+    public MediaType getFileType(String filePath) throws IOException {
+        String contentType = Files.probeContentType(Paths.get(filePath));
+        String[] base_sub = contentType.split("/");
+        String type = base_sub[0];
+        String subtype = base_sub[1];
+        return new MediaType(type, subtype);
     }
 
     @Override

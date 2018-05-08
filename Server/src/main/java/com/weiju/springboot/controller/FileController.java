@@ -12,7 +12,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -24,17 +23,15 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 上传临时文件和获取临时文件
- * 用于测试
+ * 上传文件和获取文件
+ *
  * 文件存储路径： /data/temp
  */
 @Controller
@@ -43,8 +40,8 @@ public class FileController {
     private static Logger logger = LoggerFactory.getLogger(FileController.class);
     private final FileService fileService;
     private final String BASE_PATH = Paths.get(".").toAbsolutePath().toString();
-    private final String DATA_PATH = "";
-    private final String TMP_PATH = "/data/temp" + DATA_PATH;
+    private final String DATA_PATH = "/data";
+    private final String TMP_PATH =   DATA_PATH + "/temp";
     private final Environment environment; // 监听应用的ip:port
 
     private final ResourceLoader resourceLoader;
@@ -57,17 +54,13 @@ public class FileController {
     }
 
     /**
-     * 临时的文件上传，返回获得文件的完整url
-     * 写死了服务器的ip 需要在配置文件中说明服务器ip
-     *
+     * 基本的文件上传方法，需要提供目标路径
      * @param multipartFiles
-     * @return
+     * @param path
+     * @return ResponseEntity<String>
      * @throws BaseException
      */
-    @PostMapping(value = "")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") List<MultipartFile> multipartFiles) throws BaseException {
-        logger.info("request uploadFile");
-        Path path = Paths.get(BASE_PATH, TMP_PATH);
+    private ResponseEntity<String> uploadFile( List<MultipartFile> multipartFiles , Path path , String relativePath) throws BaseException {
         LinkedHashMap<String, String> url_list = new LinkedHashMap<>();
         logger.info("get store path" + path.toString());
 
@@ -86,7 +79,7 @@ public class FileController {
                 String newFilename = fileService.getNewfilename(file.getOriginalFilename());
                 URL url = fileService.store(file, path, newFilename);
                 // TODO get real server ip
-                url_list.put(file.getOriginalFilename(), "http://" + "206.189.35.98" + ":" + port + DATA_PATH + "/api/file/" + newFilename);
+                url_list.put(file.getOriginalFilename(), "http://" + "206.189.35.98" + ":" + port+"/api/file" + DATA_PATH +relativePath+ "/"+ newFilename);
                 logger.info("stored");
                 logger.info(url.toString());
             }
@@ -101,23 +94,16 @@ public class FileController {
     }
 
     /**
-     * get file by file name
-     * @param  filename
-     * @return file
+     * 根据完整文件路径和文件名获取文件
+     * @param filePath
+     * @return Resource
      * @throws BaseException
      */
-    @GetMapping(value = "/{filename}")
-    public ResponseEntity<Resource> getFile(@PathVariable("filename") String filename) throws BaseException{
+    private ResponseEntity<Resource> getFile(String filePath) throws BaseException {
         try {
-            // 获取文件路径
-            String filePath = Paths.get(BASE_PATH,TMP_PATH).resolve(filename).toString();
-
+            logger.info("try to get file : "+filePath);
             UrlResource resource = new FileUrlResource(filePath);
-            String contentType = Files.probeContentType(Paths.get(filePath));
-            String[] base_sub = contentType.split("/");
-            String type = base_sub[0];
-            String subtype = base_sub[1];
-            return ResponseEntity.ok().contentType(new MediaType(type, subtype)).body(resource);
+            return ResponseEntity.ok().contentType(fileService.getFileType(filePath)).body(resource);
         } catch (MalformedURLException e) {
             throw new BaseException("File not found", HttpStatus.NOT_FOUND);
 
@@ -127,4 +113,65 @@ public class FileController {
         }
     }
 
+
+
+    /**
+     * 临时的文件上传，返回获得文件的完整url
+     * 写死了服务器的ip 需要在配置文件中说明服务器ip
+     *用于测试
+     * @param multipartFiles
+     * @return
+     * @throws BaseException
+     */
+    @PostMapping(value = "")
+    public ResponseEntity<String> uploadTempFile(@RequestParam("file") List<MultipartFile> multipartFiles) throws BaseException {
+        logger.info("request uploadFile");
+        Path path = Paths.get(BASE_PATH, TMP_PATH);
+        return  uploadFile(multipartFiles,path,"/temp");
+    }
+
+
+
+
+    /**
+     * 根据文件名获取临时文件
+     * 用于测试
+     * @param  filename
+     * @return file
+     * @throws BaseException
+     */
+    @GetMapping(value = "/data/temp/{filename}")
+    public ResponseEntity<Resource> getTempFile(@PathVariable("filename") String filename) throws BaseException{
+
+        return getFile(Paths.get(BASE_PATH,TMP_PATH).resolve(filename).toString());
+
+    }
+
+
+
+    /**
+     * 根据文件名获取任务的图片
+     * @param filename
+     * @return
+     */
+    @GetMapping(value = "/data/tasks/{taskid}/pictures/{filename}")
+    public ResponseEntity<Resource> getTaskFile(@PathVariable("filename") String filename,@PathVariable("taskid") int taskid) throws BaseException {
+        String id = String.valueOf(taskid);
+        String filepath = Paths.get(BASE_PATH,DATA_PATH+"/tasks/" + id + "/pictures/" + filename).toString();
+        return getFile(filepath);
+    }
+
+    /**
+     * 上传图片到任务
+     * @param taskid
+     * @return
+     */
+    @PostMapping(value = "/tasks/pictures/{taskid}")
+    public ResponseEntity<String> uploadTaskFile(@PathVariable("taskid") int taskid, @RequestParam("file")List<MultipartFile> multipartFiles) throws BaseException {
+        logger.info("request uploadFile");
+        String id = String.valueOf(taskid);
+        String relativePath = "/tasks/" + id + "/pictures";
+        Path path = Paths.get(BASE_PATH, DATA_PATH + relativePath);
+        return uploadFile(multipartFiles,path,relativePath);
+    }
 }

@@ -1,11 +1,14 @@
 package com.weiju.springboot.service;
 
 import com.weiju.springboot.exception.BaseException;
+import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 public interface FileService {
@@ -15,6 +18,7 @@ public interface FileService {
 
     URL store(MultipartFile file, Path path, String newFilename) throws BaseException;
 
+    MediaType getFileType(String filePath) throws IOException;
 
     Stream<Path> loadAll(Path path) throws BaseException;
 
