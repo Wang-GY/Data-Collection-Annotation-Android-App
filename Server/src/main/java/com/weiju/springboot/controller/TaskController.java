@@ -50,7 +50,7 @@ public class TaskController {
         return tasks;
     }
 
-    @GetMapping("/")
+    @GetMapping("/{task_id}")
     public String getTaskById(@RequestParam(value = "task_id", required = true) String task_id) {
         return taskService.getTaskProfile(Integer.parseInt(task_id)).toString();
     }

@@ -38,3 +38,7 @@ tags
 
 
 Server/\.idea/
+
+Server/target/
+
+Server/data/temp/
