@@ -58,8 +58,8 @@ public class FileController {
 
     /**
      * 临时的文件上传，返回获得文件的完整url
-     * 写死了服务器的ip 需要处理
-     * 
+     * 写死了服务器的ip 需要在配置文件中说明服务器ip
+     *
      * @param multipartFiles
      * @return
      * @throws BaseException
