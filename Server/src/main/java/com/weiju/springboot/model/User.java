@@ -52,7 +52,7 @@ public class User {
     private List<Task> tasks; // user tasks
 
     //mappedBy : model 层定义的变量，不是数据库的字段
-    @OneToMany(mappedBy = "commiterId", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Commit.class)
+    @OneToMany(mappedBy = "committerId", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Commit.class)
     private List<Commit> commits;
 
 

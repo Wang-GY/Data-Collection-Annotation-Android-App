@@ -12,6 +12,41 @@ public class Commit {
     @Column(name = "commitid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int commitid;
+
+    public int getCommitid() {
+        return commitid;
+    }
+
+
+    public int getCommitTime() {
+        return commitTime;
+    }
+
+
+    public int getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public int getCommitterId() {
+        return committerId;
+    }
+
+    public void setCommitterId(int committerId) {
+        this.committerId = committerId;
+    }
+
     @Column(name = "commit_time")
     private int commitTime;
 
@@ -25,6 +60,6 @@ public class Commit {
 
     @ManyToOne(cascade = CascadeType.REFRESH, targetEntity = User.class)
     @JoinColumn(name = "commiter", referencedColumnName = "userid")
-    private int commiterId;
+    private int committerId;
 
 }
