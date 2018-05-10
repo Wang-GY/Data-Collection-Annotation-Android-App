@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/tasks")
+@RequestMapping("/api/tasks")
 public class TaskController {
 
     private final TaskService taskService;
@@ -28,16 +28,16 @@ public class TaskController {
     public HttpStatus createTask(@RequestBody Map<String, Map<String, Object>> payload) {
         JSONObject data = new JSONObject(payload.get("data"));
         int uuid = Integer.parseInt(data.getString("uuid"));
-        String formatter = data.getString("formatter");
+        String formatter = data.getJSONObject("formatter").toString();
         String title  = data.getString("title");
         String start_time = data.getString("start_time");
         String deadline = data.getString("deadline");
         String description = data.getString("description");
-        int type = Integer.parseInt(data.getString("type"));
+        int type = data.getInt("type");
 
         taskService.createTask(uuid, formatter, title, start_time, deadline, description, type);
 
-        return HttpStatus.OK;
+        return HttpStatus.CREATED;
     }
 
 

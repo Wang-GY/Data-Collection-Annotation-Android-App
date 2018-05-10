@@ -19,7 +19,7 @@ public class Task {
     private String description;
 
     @Column(name = "start_time")
-    private String start_time; //WHY don't use DATETIME OF MYSQL
+    private String start_time;
 
     @Column(name = "type")
     private int type;
