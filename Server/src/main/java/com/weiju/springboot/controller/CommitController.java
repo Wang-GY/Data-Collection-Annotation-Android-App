@@ -50,7 +50,7 @@ public class CommitController {
      * @param payload request body
      * @return
      */
-    @PostMapping()
+    @PostMapping("/")
     public ResponseEntity<String> uploadCommit(@RequestBody Map<String,Map<String,Object>> payload) throws BaseException {
         logger.info("request body "+ payload.toString());
         Map<String, Object> commit_data =  payload.get("data");
@@ -77,7 +77,7 @@ public class CommitController {
      * @return 新文件路径（用作测试）
      * @throws BaseException
      */
-    @PostMapping("/pictures/{commitid}")
+    @PostMapping("/pictures/{commitid}/")
     public ResponseEntity<String> uploadCollectionData(@PathVariable(value = "commitid") int commitid, @RequestParam("file") List<MultipartFile> multipartFiles) throws BaseException {
         logger.info("commit picture with id : " + String.valueOf(commitid));
         // get commit

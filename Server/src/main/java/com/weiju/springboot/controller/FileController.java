@@ -82,7 +82,7 @@ public class FileController {
      * @return
      * @throws BaseException
      */
-    @PostMapping(value = "")
+    @PostMapping(value = "/")
     public ResponseEntity<String> uploadTempFile(@RequestParam("file") List<MultipartFile> multipartFiles) throws BaseException {
         logger.info("request uploadFile");
 
