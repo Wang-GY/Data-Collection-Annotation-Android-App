@@ -1,6 +1,7 @@
 package com.weiju.springboot.controller;
 
 import com.weiju.springboot.exception.BaseException;
+import com.weiju.springboot.model.DataMetaErr;
 import com.weiju.springboot.service.FileService;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -28,81 +29,39 @@ import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 上传文件和获取文件
  *
- * 文件存储路径： /data/temp
+ * 文件存储路径： /data
  */
 @Controller
 @RequestMapping("api/file")
 public class FileController {
     private static Logger logger = LoggerFactory.getLogger(FileController.class);
     private final FileService fileService;
-    private final String BASE_PATH = Paths.get(".").toAbsolutePath().toString();
-    private final String DATA_PATH = "/data";
-    private final String TMP_PATH =   DATA_PATH + "/temp";
-    private final Environment environment; // 监听应用的ip:port
 
-    private final ResourceLoader resourceLoader;
+    private final String TMP_PATH =  "/temp";
 
     @Autowired
-    public FileController(FileService fileService, ResourceLoader resourceLoader, Environment environment) {
+    public FileController(FileService fileService) {
         this.fileService = fileService;
-        this.resourceLoader = resourceLoader;
-        this.environment = environment;
+
     }
 
-    /**
-     * 基本的文件上传方法，需要提供目标路径
-     * @param multipartFiles
-     * @param path
-     * @return ResponseEntity<String>
-     * @throws BaseException
-     */
-    private ResponseEntity<String> uploadFile( List<MultipartFile> multipartFiles , Path path , String relativePath) throws BaseException {
-        LinkedHashMap<String, String> url_list = new LinkedHashMap<>();
-        logger.info("get store path" + path.toString());
-
-        String port = environment.getProperty("local.server.port");
-        InetAddress ip = null;
-        try {
-            ip = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            throw new BaseException("InteAdress error", HttpStatus.INTERNAL_SERVER_ERROR, e);
-        }
-        try {
-            Iterator iterator = multipartFiles.iterator();
-            while (iterator.hasNext()) {
-                MultipartFile file = (MultipartFile) iterator.next();
-                String newFilename = fileService.getNewfilename(file.getOriginalFilename());
-                URL url = fileService.store(file, path, newFilename);
-                // TODO get real server ip
-                url_list.put(file.getOriginalFilename(), "http://" + "206.189.35.98" + ":" + port+"/api/file" + DATA_PATH +relativePath+ "/"+ newFilename);
-                logger.info("stored");
-                logger.info(url.toString());
-            }
-
-        } catch (BaseException e) {
-            e.printStackTrace();
-        }
-
-        JSONObject response = new JSONObject();
-        response.put("data", url_list);
-        return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
-    }
 
     /**
-     * 根据完整文件路径和文件名获取文件
-     * @param filePath
+     * 相对于/data
+     * 根据相对路径+文件名获取文件
+     * @param filePath 文件相对路径
      * @return Resource
      * @throws BaseException
      */
     private ResponseEntity<Resource> getFile(String filePath) throws BaseException {
         try {
             logger.info("try to get file : "+filePath);
-            UrlResource resource = new FileUrlResource(filePath);
+            Resource resource = fileService.getFile(filePath);
             return ResponseEntity.ok().contentType(fileService.getFileType(filePath)).body(resource);
         } catch (MalformedURLException e) {
             throw new BaseException("File not found", HttpStatus.NOT_FOUND);
@@ -126,11 +85,13 @@ public class FileController {
     @PostMapping(value = "")
     public ResponseEntity<String> uploadTempFile(@RequestParam("file") List<MultipartFile> multipartFiles) throws BaseException {
         logger.info("request uploadFile");
-        Path path = Paths.get(BASE_PATH, TMP_PATH);
-        return  uploadFile(multipartFiles,path,"/temp");
+
+        Map<String,String> file_urls = fileService.uploadFiles(multipartFiles,TMP_PATH);
+        JSONObject response = new JSONObject();
+        response.put("data",file_urls);
+        logger.info(response.toString());
+        return new ResponseEntity<>(response.toString(),HttpStatus.CREATED);
     }
-
-
 
 
     /**
@@ -140,38 +101,24 @@ public class FileController {
      * @return file
      * @throws BaseException
      */
-    @GetMapping(value = "/data/temp/{filename}")
+    @GetMapping(value = "/temp/{filename}")
     public ResponseEntity<Resource> getTempFile(@PathVariable("filename") String filename) throws BaseException{
 
-        return getFile(Paths.get(BASE_PATH,TMP_PATH).resolve(filename).toString());
+        return getFile(Paths.get(TMP_PATH).resolve(filename).toString());
 
     }
-
-
 
     /**
      * 根据文件名获取任务的图片
      * @param filename
      * @return
      */
-    @GetMapping(value = "/data/tasks/{taskid}/pictures/{filename}")
+    @GetMapping(value = "/tasks/{taskid}/pictures/{filename}")
     public ResponseEntity<Resource> getTaskFile(@PathVariable("filename") String filename,@PathVariable("taskid") int taskid) throws BaseException {
         String id = String.valueOf(taskid);
-        String filepath = Paths.get(BASE_PATH,DATA_PATH+"/tasks/" + id + "/pictures/" + filename).toString();
+        String filepath = Paths.get("tasks/" + id + "/pictures/" + filename).toString();
         return getFile(filepath);
     }
 
-    /**
-     * 上传图片到任务
-     * @param taskid
-     * @return
-     */
-    @PostMapping(value = "/tasks/pictures/{taskid}")
-    public ResponseEntity<String> uploadTaskFile(@PathVariable("taskid") int taskid, @RequestParam("file")List<MultipartFile> multipartFiles) throws BaseException {
-        logger.info("request uploadFile");
-        String id = String.valueOf(taskid);
-        String relativePath = "/tasks/" + id + "/pictures";
-        Path path = Paths.get(BASE_PATH, DATA_PATH + relativePath);
-        return uploadFile(multipartFiles,path,relativePath);
-    }
+
 }

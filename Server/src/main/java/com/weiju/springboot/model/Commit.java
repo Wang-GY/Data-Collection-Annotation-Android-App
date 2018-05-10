@@ -18,17 +18,19 @@ public class Commit {
     }
 
 
-    public int getCommitTime() {
+    public String getCommitTime() {
         return commitTime;
     }
-
-
-    public int getTaskId() {
-        return taskId;
+    public void setCommitTime(String time){
+        this.commitTime = time;
     }
 
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
+    public Task getTask() {
+        return task;
+    }
+
+    public void setTask(Task task) {
+        this.task = task;
     }
 
     public int getSize() {
@@ -39,27 +41,27 @@ public class Commit {
         this.size = size;
     }
 
-    public int getCommitterId() {
-        return committerId;
+    public User getCommitter() {
+        return committer;
     }
 
-    public void setCommitterId(int committerId) {
-        this.committerId = committerId;
+    public void setCommitter(User committer) {
+        this.committer = committer;
     }
 
     @Column(name = "commit_time")
-    private int commitTime;
+    private String commitTime;
 
 
     @ManyToOne(cascade = CascadeType.REFRESH, targetEntity = Task.class)
     @JoinColumn(name = "task", referencedColumnName = "taskid")
-    private int taskId;
+    private Task task;
 
     @Column(name = "size")
     private int size;
 
     @ManyToOne(cascade = CascadeType.REFRESH, targetEntity = User.class)
     @JoinColumn(name = "commiter", referencedColumnName = "userid")
-    private int committerId;
+    private User committer;
 
 }

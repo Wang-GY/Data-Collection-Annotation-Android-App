@@ -1,6 +1,7 @@
 package com.weiju.springboot.model;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "tasks")
@@ -31,7 +32,7 @@ public class Task {
 
     @ManyToOne(cascade = CascadeType.REFRESH, targetEntity = User.class)
     @JoinColumn(name = "creator", referencedColumnName = "userid")
-    private int creator;
+    private User creator;
 
     @Column(name = "progress")
     private String progress;
@@ -42,11 +43,19 @@ public class Task {
     @Column(name = "deadline")
     private String deadline;
 
-    public void setCreator(int creator) {
+    //mappedBy : model 层定义的变量，不是数据库的字段
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Commit.class)
+    private List<Commit> commits;
+
+    public List<Commit> getCommits(){
+        return commits;
+    }
+
+    public void setCreator(User creator) {
         this.creator = creator;
     }
 
-    public int getCreator() {
+    public User getCreator() {
         return creator;
     }
 

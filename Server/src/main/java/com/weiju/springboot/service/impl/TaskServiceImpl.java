@@ -2,6 +2,7 @@ package com.weiju.springboot.service.impl;
 
 import com.weiju.springboot.model.Task;
 import com.weiju.springboot.repository.TaskRepository;
+import com.weiju.springboot.repository.UserRepository;
 import com.weiju.springboot.service.TaskService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +18,11 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
 
-    public TaskServiceImpl(JdbcTemplate jdbcTemplate, TaskRepository taskRepository) {
+    private final UserRepository userRepository;
+    public TaskServiceImpl(JdbcTemplate jdbcTemplate, TaskRepository taskRepository, UserRepository userRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.taskRepository = taskRepository;
+        this. userRepository = userRepository;
     }
 
     @Override
@@ -28,7 +31,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = new Task();
         task.setFormater(formater);
         task.setName(title);
-        task.setCreator(uuid);
+        task.setCreator(userRepository.findByUserid(uuid));
         task.setStart_time(start_time);
         task.setDeadline(deadline);
         task.setDescription(description);
