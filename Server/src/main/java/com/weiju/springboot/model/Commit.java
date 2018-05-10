@@ -61,7 +61,7 @@ public class Commit {
     private int size;
 
     @ManyToOne(cascade = CascadeType.REFRESH, targetEntity = User.class)
-    @JoinColumn(name = "commiter", referencedColumnName = "userid")
+    @JoinColumn(name = "committer", referencedColumnName = "userid")
     private User committer;
 
 }
