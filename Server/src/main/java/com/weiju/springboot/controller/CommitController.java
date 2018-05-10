@@ -2,6 +2,7 @@ package com.weiju.springboot.controller;
 
 import com.weiju.springboot.exception.BaseException;
 import com.weiju.springboot.model.Commit;
+import com.weiju.springboot.model.DataMetaErr;
 import com.weiju.springboot.model.Task;
 import com.weiju.springboot.model.User;
 import com.weiju.springboot.repository.CommitRepository;
@@ -87,7 +88,7 @@ public class CommitController {
         }
         int taskid = commit.getTask().getTaskid();
         String id = String.valueOf(taskid);
-        Map<String,String> url_list = fileService.uploadFiles(multipartFiles,"tasks/" + id + "/pictures");
+        Map<String,String> url_list = fileService.uploadFiles(multipartFiles,"/tasks/" + id + "/pictures");
         JSONObject response = new JSONObject();
         response.put("data",url_list);
         return new ResponseEntity<>(response.toString(),HttpStatus.CREATED);
@@ -122,8 +123,10 @@ public class CommitController {
 
             // construct response data meta error format
             JSONObject response = new JSONObject();
-            response.put("commitid",commit1.getCommitid());
-            response.put("data", response);
+            JSONObject data = new JSONObject();
+            data.put("commitid",commit1.getCommitid());
+            response.put("data",data);
+
             return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
 
         } catch (Exception e) {
