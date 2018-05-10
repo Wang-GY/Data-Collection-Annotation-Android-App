@@ -1,5 +1,6 @@
 package com.weiju.springboot.controller;
 
+import com.weiju.springboot.model.DataMetaErr;
 import com.weiju.springboot.model.Task;
 import com.weiju.springboot.repository.TaskRepository;
 import com.weiju.springboot.service.TaskService;
@@ -51,8 +52,23 @@ public class TaskController {
     }
 
     @GetMapping("/{task_id}")
-    public String getTaskById(@RequestParam(value = "task_id", required = true) String task_id) {
-        return taskService.getTaskProfile(Integer.parseInt(task_id)).toString();
+    public String getTaskById(@PathVariable(value = "task_id", required = true) String task_id) {
+        JSONObject payload = new JSONObject();
+        Task task = taskService.getTaskProfile(Integer.parseInt(task_id));
+        JSONObject taskJSON = new JSONObject();
+        taskJSON.put("name", task.getName());
+        taskJSON.put("id", task.getTaskid());
+        taskJSON.put("start_time", task.getStart_time());
+        taskJSON.put("type", task.getType());
+        taskJSON.put("size", task.getSize());
+        taskJSON.put("data_path", task.getData_path());
+        taskJSON.put("creator", task.getCreator().getUserid());
+        taskJSON.put("progress", task.getProgress());
+        taskJSON.put("deadline", task.getDeadline());
+        taskJSON.put("formater", task.getFormater());
+
+        payload.put("data", taskJSON);
+        return payload.toString();
     }
 
     @PatchMapping("/{id}")
