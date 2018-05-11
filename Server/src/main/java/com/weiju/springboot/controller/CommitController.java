@@ -35,12 +35,13 @@ public class CommitController {
     final FileService fileService;
     final UserRepository userRepository;
     final TaskRepository taskRepository;
+
     @Autowired
-    public CommitController(CommitRepository commitRepository,FileService fileService,UserRepository userRepository, TaskRepository taskRepository) {
+    public CommitController(CommitRepository commitRepository, FileService fileService, UserRepository userRepository, TaskRepository taskRepository) {
         this.commitRepository = commitRepository;
         this.fileService = fileService;
         this.userRepository = userRepository;
-        this.taskRepository =taskRepository;
+        this.taskRepository = taskRepository;
     }
 
     /**
@@ -51,13 +52,13 @@ public class CommitController {
      * @return
      */
     @PostMapping("/")
-    public ResponseEntity<String> uploadCommit(@RequestBody Map<String,Map<String,Object>> payload) throws BaseException {
-        logger.info("request body "+ payload.toString());
-        Map<String, Object> commit_data =  payload.get("data");
-        logger.info("commit data: "+ commit_data);
+    public ResponseEntity<String> uploadCommit(@RequestBody Map<String, Map<String, Object>> payload) throws BaseException {
+        logger.info("request body " + payload.toString());
+        Map<String, Object> commit_data = payload.get("data");
+        logger.info("commit data: " + commit_data);
 
         int task_type = (int) commit_data.get("task_type");
-        logger.info("commit type:"+ task_type);
+        logger.info("commit type:" + task_type);
         switch (task_type) {
             case 0: // Annotation
                 logger.info("Annotation");
@@ -72,6 +73,7 @@ public class CommitController {
 
     /**
      * 提交采集任务的图片
+     *
      * @param commitid
      * @param multipartFiles 图片
      * @return 新文件路径（用作测试）
@@ -88,10 +90,10 @@ public class CommitController {
         }
         int taskid = commit.getTask().getTaskid();
         String id = String.valueOf(taskid);
-        Map<String,String> url_list = fileService.uploadFiles(multipartFiles,"/tasks/" + id + "/pictures");
+        List<String> url_list = fileService.uploadFiles(multipartFiles, "/tasks/" + id + "/pictures");
         JSONObject response = new JSONObject();
-        response.put("data",url_list);
-        return new ResponseEntity<>(response.toString(),HttpStatus.CREATED);
+        response.put("data", url_list);
+        return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
     }
 
     /**
@@ -107,15 +109,15 @@ public class CommitController {
             int taskid = (int) commit_data.get("task_id");
             // get task
             Task task = taskRepository.findByTaskid(taskid);
-            if (task == null){
-                throw  new BaseException("Task not found",HttpStatus.NOT_FOUND);
+            if (task == null) {
+                throw new BaseException("Task not found", HttpStatus.NOT_FOUND);
             }
             commit.setTask(task);
 
             // get creator
-            User creator = userRepository.findByUserid((Integer) commit_data.get("committer_id") );
-            if(creator == null){
-                throw  new BaseException("creator not found",HttpStatus.NOT_FOUND);
+            User creator = userRepository.findByUserid((Integer) commit_data.get("committer_id"));
+            if (creator == null) {
+                throw new BaseException("creator not found", HttpStatus.NOT_FOUND);
             }
             commit.setCommitter(creator);
             commit.setCommitTime(Instant.now().toString());
@@ -124,14 +126,14 @@ public class CommitController {
             // construct response data meta error format
             JSONObject response = new JSONObject();
             JSONObject data = new JSONObject();
-            data.put("commitid",commit1.getCommitid());
-            response.put("data",data);
+            data.put("commitid", commit1.getCommitid());
+            response.put("data", data);
 
             return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new BaseException("exception",HttpStatus.INTERNAL_SERVER_ERROR,e);
+            throw new BaseException("exception", HttpStatus.INTERNAL_SERVER_ERROR, e);
         }
 
     }
@@ -145,6 +147,22 @@ public class CommitController {
     private ResponseEntity<String> uploadAnnotationCommit(Map<String, Object> commit_data) {
 
 
+        return null;
+    }
+
+    /**
+     * 给定userid,task_id,limit 返回
+     * @param userid
+     * @param task_id
+     * @param limit
+     * @return
+     */
+    @GetMapping()
+    public ResponseEntity<String> getUserCommits(@RequestParam(name = "user", required = false) int userid,
+                                                 @RequestParam(name = "task", required = false) int task_id,
+                                                 @RequestParam(name = "limit", required = false) int limit,
+                                                 @RequestParam(name = "offset",required = false,defaultValue = "1")int offset
+    ) {
 
         
 

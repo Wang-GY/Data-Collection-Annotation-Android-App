@@ -86,7 +86,7 @@ public class FileController {
     public ResponseEntity<String> uploadTempFile(@RequestParam("file") List<MultipartFile> multipartFiles) throws BaseException {
         logger.info("request uploadFile");
 
-        Map<String,String> file_urls = fileService.uploadFiles(multipartFiles,TMP_PATH);
+        List<String> file_urls = fileService.uploadFiles(multipartFiles,TMP_PATH);
         JSONObject response = new JSONObject();
         response.put("data",file_urls);
         logger.info(response.toString());

@@ -23,10 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 
@@ -55,8 +52,8 @@ public class FileServiceImpl implements FileService {
      * @return 新文件的url列表
      */
     @Override
-    public Map<String, String> uploadFiles(List<MultipartFile> multipartFiles, String relativePath) {
-        LinkedHashMap<String, String> url_list = new LinkedHashMap<>();
+    public List<String> uploadFiles(List<MultipartFile> multipartFiles, String relativePath) {
+        List<String> url_list = new LinkedList<>();
         String port = environment.getProperty("local.server.port");
         logger.info("BASE PATH: "+BASE_PATH.toString());
         try {
@@ -65,7 +62,7 @@ public class FileServiceImpl implements FileService {
                 MultipartFile file = (MultipartFile) iterator.next();
                 String newFilename = store(file, Paths.get(BASE_PATH,relativePath));
                 // TODO get real server ip
-                url_list.put(file.getOriginalFilename(), "http://" + "206.189.35.98" + ":" + port + "/api/file"  + relativePath + "/" + newFilename);
+                url_list.add("http://" + "206.189.35.98" + ":" + port + "/api/file"  + relativePath + "/" + newFilename);
                 logger.info("stored into "+Paths.get(BASE_PATH,relativePath).toString());
             }
             return url_list;

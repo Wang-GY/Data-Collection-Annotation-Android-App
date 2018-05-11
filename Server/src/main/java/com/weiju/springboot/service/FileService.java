@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 public interface FileService {
 
 
-    Map<String, String> uploadFiles(List<MultipartFile> multipartFiles, String relativePath);
+    List<String> uploadFiles(List<MultipartFile> multipartFiles, String relativePath);
 
     Resource getFile(String relativePath) throws MalformedURLException;
 
