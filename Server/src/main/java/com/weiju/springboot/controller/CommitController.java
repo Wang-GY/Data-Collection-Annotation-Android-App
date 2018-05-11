@@ -1,10 +1,8 @@
 package com.weiju.springboot.controller;
 
 import com.weiju.springboot.exception.BaseException;
-import com.weiju.springboot.model.Commit;
-import com.weiju.springboot.model.DataMetaErr;
-import com.weiju.springboot.model.Task;
-import com.weiju.springboot.model.User;
+import com.weiju.springboot.model.*;
+import com.weiju.springboot.repository.CommitDataRepository;
 import com.weiju.springboot.repository.CommitRepository;
 import com.weiju.springboot.repository.TaskRepository;
 import com.weiju.springboot.repository.UserRepository;
@@ -35,13 +33,17 @@ public class CommitController {
     final FileService fileService;
     final UserRepository userRepository;
     final TaskRepository taskRepository;
+    final CommitDataRepository commitDataRepository;
 
     @Autowired
-    public CommitController(CommitRepository commitRepository, FileService fileService, UserRepository userRepository, TaskRepository taskRepository) {
+    public CommitController(CommitRepository commitRepository, FileService fileService, UserRepository userRepository,
+                            TaskRepository taskRepository,
+                            CommitDataRepository commitDataRepository) {
         this.commitRepository = commitRepository;
         this.fileService = fileService;
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
+        this.commitDataRepository = commitDataRepository;
     }
 
     /**
@@ -91,6 +93,14 @@ public class CommitController {
         int taskid = commit.getTask().getTaskid();
         String id = String.valueOf(taskid);
         List<String> url_list = fileService.uploadFiles(multipartFiles, "/tasks/" + id + "/pictures");
+
+        for (String item : url_list){
+            logger.info(item);
+            CommitData commitData = new CommitData();
+            commitData.setCommitId(commit);
+            commitData.setItemPath(item);
+            commitDataRepository.save(commitData);
+        }
         JSONObject response = new JSONObject();
         response.put("data", url_list);
         return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);

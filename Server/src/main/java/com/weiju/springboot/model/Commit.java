@@ -3,6 +3,7 @@ package com.weiju.springboot.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "commits")
@@ -64,4 +65,6 @@ public class Commit {
     @JoinColumn(name = "committer", referencedColumnName = "userid")
     private User committer;
 
+    @OneToMany(mappedBy = "commitId", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = CommitData.class)
+    private List<CommitData> commitDataList;
 }
