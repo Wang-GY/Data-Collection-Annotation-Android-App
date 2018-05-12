@@ -15,9 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,15 +58,15 @@ public class FileServiceImpl implements FileService {
     public List<String> uploadFiles(List<MultipartFile> multipartFiles, String relativePath) {
         List<String> url_list = new LinkedList<>();
         String port = environment.getProperty("local.server.port");
-        logger.info("BASE PATH: "+BASE_PATH.toString());
+        logger.info("BASE PATH: " + BASE_PATH.toString());
         try {
             Iterator iterator = multipartFiles.iterator();
             while (iterator.hasNext()) {
                 MultipartFile file = (MultipartFile) iterator.next();
-                String newFilename = store(file, Paths.get(BASE_PATH,relativePath));
+                String newFilename = store(file, Paths.get(BASE_PATH, relativePath));
                 // TODO get real server ip
-                url_list.add("http://" + "206.189.35.98" + ":" + port + "/api/file"  + relativePath + "/" + newFilename);
-                logger.info("stored into "+Paths.get(BASE_PATH,relativePath).toString());
+                url_list.add("http://" + "206.189.35.98" + ":" + port + "/api/file" + relativePath + "/" + newFilename);
+                logger.info("stored into " + Paths.get(BASE_PATH, relativePath).toString());
             }
             return url_list;
         } catch (BaseException e) {
@@ -74,18 +77,20 @@ public class FileServiceImpl implements FileService {
 
     /**
      * 根据文件相对路径获取文件
+     *
      * @param relativePath 相对于 /data 的路径
      * @return
      */
     @Override
     public Resource getFile(String relativePath) throws MalformedURLException {
-        String filePath = Paths.get(BASE_PATH,relativePath).toString();
+        String filePath = Paths.get(BASE_PATH, relativePath).toString();
         UrlResource resource = new FileUrlResource(filePath);
         return resource;
     }
 
     /**
      * 初始化文件传输路径
+     *
      * @param path
      * @throws BaseException
      */
@@ -103,15 +108,108 @@ public class FileServiceImpl implements FileService {
     }
 
 
+    /**
+     * 将一个字符串写入文件并且储存
+     *
+     * @param data         待写入的字符串
+     * @param filename     写入的文件名
+     * @param relativePath 文件存储的相对路径 （/data）
+     */
+    @Override
+    public void storeString(String data, String filename, String relativePath) throws FileNotFoundException, BaseException {
+        Path path = Paths.get(BASE_PATH, relativePath);
+        init(path);// create path if not exist
+        InputStream inputStream = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
+        try {
+            Files.copy(inputStream, path.resolve(filename));
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new BaseException("IOException", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
+
+
+    }
+
+    /**
+     * 根据url 获取资源在服务器上的相对路径
+     *
+     * @param url
+     * @return 相对路径 (/data)
+     */
+    @Override
+    public String getRelativePathByUrl(String url) {
+        boolean is_path = false;
+        String relativePath = "";
+        String[] path = url.split("/");
+        for (String item : path) {
+            if (item.equals("file")) { // check the "file" in /api/file. should show up first
+                is_path = true;
+                continue;// don't want file
+            }
+            if (is_path) {
+                relativePath = relativePath + "/" + item;
+            }
+        }
+        return relativePath;
+    }
+
+    /**
+     * 传入当前路径，返回上级路径
+     *
+     * @param path
+     * @return
+     */
+    @Override
+    public String getParentPath(String path) {
+        String items[] = path.split("/");
+        String parentPath = "";
+        // TODO why item[0] is ""
+        for (int i = 1; i < items.length - 1; i++) { // start from 1 :  why item[0] is ""
+            logger.info(items[i]);
+            parentPath = parentPath + "/" + items[i];
+        }
+        return parentPath;
+    }
+
+    /**
+     * 根据文件的相对路径得到文件名
+     *
+     * @param relativePath 文件的相对路径
+     * @return 文件名
+     */
+    @Override
+    public String getFilenameByRelativePath(String relativePath) {
+        String[] path = relativePath.split("/");
+        if (path.length - 1 >= 0)
+            return path[path.length - 1];
+        else // invalid relative path
+            return null;
+    }
+
+    /**
+     * 根据url 返回文件名称
+     *
+     * @param url
+     * @return 文件名
+     */
+    @Override
+    public String getFilenameByUrl(String url) {
+        return getFilenameByRelativePath(url);
+    }
+
+
     @Override
     public String store(MultipartFile file, Path path) throws BaseException {
+        return store(file, path, getNewFilename(file.getOriginalFilename()));
+    }
+
+    private String store(MultipartFile file, Path path, String newFilename) throws BaseException {
 
         try {
             if (file.isEmpty()) {
                 throw new BaseException("Failed to store empty file" + file.getOriginalFilename(), HttpStatus.NOT_FOUND);
             }
             init(path);
-            String newFilename = getNewfilename(file.getOriginalFilename());
             Files.copy(file.getInputStream(), path.resolve(newFilename));
             return newFilename;
         } catch (IOException e) {
@@ -172,7 +270,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public String getNewfilename(String oldfilename) {
-        return Instant.now().toString().replace(":", "-") + oldfilename;
+    public String getNewFilename(String oldFilename) {
+        return Instant.now().toString().replace(":", "-") + oldFilename;
     }
 }

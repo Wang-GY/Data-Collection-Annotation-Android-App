@@ -6,8 +6,11 @@ import com.weiju.springboot.repository.CommitDataRepository;
 import com.weiju.springboot.repository.CommitRepository;
 import com.weiju.springboot.repository.TaskRepository;
 import com.weiju.springboot.repository.UserRepository;
+import com.weiju.springboot.service.CommitDataService;
+import com.weiju.springboot.service.CommitService;
 import com.weiju.springboot.service.FileService;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,16 +37,22 @@ public class CommitController {
     final UserRepository userRepository;
     final TaskRepository taskRepository;
     final CommitDataRepository commitDataRepository;
+    final CommitService commitService;
+    final CommitDataService commitDataService;
 
     @Autowired
     public CommitController(CommitRepository commitRepository, FileService fileService, UserRepository userRepository,
                             TaskRepository taskRepository,
-                            CommitDataRepository commitDataRepository) {
+                            CommitDataRepository commitDataRepository,
+                            CommitService commitService,
+                            CommitDataService commitDataService) {
         this.commitRepository = commitRepository;
         this.fileService = fileService;
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
         this.commitDataRepository = commitDataRepository;
+        this.commitService = commitService;
+        this.commitDataService = commitDataService;
     }
 
     /**
@@ -55,22 +64,30 @@ public class CommitController {
      */
     @PostMapping("/")
     public ResponseEntity<String> uploadCommit(@RequestBody Map<String, Map<String, Object>> payload) throws BaseException {
-        logger.info("request body " + payload.toString());
-        Map<String, Object> commit_data = payload.get("data");
-        logger.info("commit data: " + commit_data);
 
-        int task_type = (int) commit_data.get("task_type");
-        logger.info("commit type:" + task_type);
-        switch (task_type) {
-            case 0: // Annotation
-                logger.info("Annotation");
-                return uploadAnnotationCommit(commit_data);
-            case 1: // Collection
-                logger.info("Collection");
-                return uploadCollectionCommit(commit_data);
-            default:
-                throw new BaseException("wrong task type", HttpStatus.INTERNAL_SERVER_ERROR);
+        try {
+            logger.info("request body " + payload.toString());
+            Map<String, Object> commit_data = payload.get("data");
+            logger.info("commit data: " + commit_data);
+
+            int task_type = (int) commit_data.get("task_type");
+            logger.info("commit type:" + task_type);
+
+            switch (task_type) {
+                case 0: // Annotation
+                    logger.info("Annotation");
+                    return uploadAnnotationCommit(commit_data);
+                case 1: // Collection
+                    logger.info("Collection");
+                    return uploadCollectionCommit(commit_data);
+                default:
+                    throw new BaseException("wrong task type", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+        } catch (JSONException e) {
+            throw new BaseException("JSONObject not found", HttpStatus.NOT_FOUND, e);
         }
+
     }
 
     /**
@@ -94,12 +111,8 @@ public class CommitController {
         String id = String.valueOf(taskid);
         List<String> url_list = fileService.uploadFiles(multipartFiles, "/tasks/" + id + "/pictures");
 
-        for (String item : url_list){
-            logger.info(item);
-            CommitData commitData = new CommitData();
-            commitData.setCommitId(commit);
-            commitData.setItemPath(item);
-            commitDataRepository.save(commitData);
+        for (String item : url_list) {
+            commitDataService.save(commit, item);
         }
         JSONObject response = new JSONObject();
         response.put("data", url_list);
@@ -114,29 +127,22 @@ public class CommitController {
      */
     private ResponseEntity<String> uploadCollectionCommit(Map<String, Object> commit_data) throws BaseException {
         try {
-            Commit commit = new Commit();
-            commit.setSize((Integer) commit_data.get("size"));
-            int taskid = (int) commit_data.get("task_id");
-            // get task
-            Task task = taskRepository.findByTaskid(taskid);
-            if (task == null) {
-                throw new BaseException("Task not found", HttpStatus.NOT_FOUND);
-            }
-            commit.setTask(task);
 
-            // get creator
-            User creator = userRepository.findByUserid((Integer) commit_data.get("committer_id"));
-            if (creator == null) {
-                throw new BaseException("creator not found", HttpStatus.NOT_FOUND);
+            Integer task_id = (Integer) commit_data.get("task_id");
+            Integer committer_id = (Integer) commit_data.get("committer_id");
+            Integer size = (Integer) commit_data.get("size");
+
+            if (task_id == null || committer_id == null || size == null) {
+                throw new BaseException("json key error: task_id or committer_id or size not found", HttpStatus.NOT_FOUND);
             }
-            commit.setCommitter(creator);
-            commit.setCommitTime(Instant.now().toString());
-            Commit commit1 = commitRepository.save(commit);
+
+
+            Commit commit = commitService.save(task_id, committer_id, size);
 
             // construct response data meta error format
             JSONObject response = new JSONObject();
             JSONObject data = new JSONObject();
-            data.put("commitid", commit1.getCommitid());
+            data.put("commitid", commit.getCommitid());
             response.put("data", data);
 
             return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
@@ -154,14 +160,57 @@ public class CommitController {
      * @param commit_data
      * @return
      */
-    private ResponseEntity<String> uploadAnnotationCommit(Map<String, Object> commit_data) {
+    private ResponseEntity<String> uploadAnnotationCommit(Map<String, Object> commit_data) throws BaseException {
+        try {
+            Integer task_id = (Integer) commit_data.get("task_id");
+            Integer committer_id = (Integer) commit_data.get("committer_id");
+            Integer size = (Integer) commit_data.get("size");
+            List<Map<String, String>> results = (List<Map<String, String>>) commit_data.get("result");
 
+            if (task_id == null || committer_id == null || size == null || results == null) {
+                throw new BaseException("json key error: task_id or committer_id or size or result not found", HttpStatus.NOT_FOUND);
+            }
+
+            Commit commit = commitService.save(task_id, committer_id, size);
+
+            for (Map<String, String> result : results) {
+                String picture_url = result.get("picture_url");
+                String xml = result.get("xml");
+                if (picture_url == null || xml == null) {
+                    throw new BaseException("json key error: picture_url or xml not found", HttpStatus.NOT_FOUND);
+                }
+                String relativePath = fileService.getRelativePathByUrl(picture_url);
+                logger.info("picture path : " + relativePath);
+                String pictureName = fileService.getFilenameByRelativePath(relativePath);
+
+                // construct xml path
+                relativePath = fileService.getParentPath(relativePath);
+                logger.info("picture parent path: " + relativePath );
+                relativePath = relativePath.replace("pictures","xmls");// change directory
+                relativePath = relativePath + "/" + pictureName;
+
+                logger.info(" xml  path :" + relativePath);
+                String xmlName = fileService.getNewFilename("-" + String.valueOf(committer_id) + ".xml");
+                logger.info("xmlName: " + xmlName );
+                fileService.storeString(xml, xmlName, relativePath);
+                // save commit data
+                commitDataService.save(commit, relativePath + "/" + xmlName);
+
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BaseException("json object field not found", HttpStatus.NOT_FOUND, e);
+
+        }
 
         return null;
     }
 
     /**
      * 给定userid,task_id,limit 返回
+     *
      * @param userid
      * @param task_id
      * @param limit
@@ -171,10 +220,9 @@ public class CommitController {
     public ResponseEntity<String> getUserCommits(@RequestParam(name = "user", required = false) int userid,
                                                  @RequestParam(name = "task", required = false) int task_id,
                                                  @RequestParam(name = "limit", required = false) int limit,
-                                                 @RequestParam(name = "offset",required = false,defaultValue = "1")int offset
+                                                 @RequestParam(name = "offset", required = false, defaultValue = "1") int offset
     ) {
 
-        
 
         return null;
     }

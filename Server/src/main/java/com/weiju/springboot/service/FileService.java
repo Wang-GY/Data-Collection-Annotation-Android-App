@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,6 +24,16 @@ public interface FileService {
 
     void init(Path path) throws BaseException;
 
+
+    void storeString(String data, String filename, String relativePath) throws FileNotFoundException, BaseException;
+
+    String getRelativePathByUrl(String url);
+
+    String getParentPath(String path);
+
+    String getFilenameByRelativePath(String relativePath);
+
+    String getFilenameByUrl(String url);
 
     /**
      * File
@@ -45,5 +56,5 @@ public interface FileService {
 
     void deleteAll(Path path);
 
-    String getNewfilename(String oldfilename);
+    String getNewFilename(String oldfilename);
 }
