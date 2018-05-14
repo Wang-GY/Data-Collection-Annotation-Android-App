@@ -46,15 +46,31 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task updateTaskProfile(int taskid, String name, String description, int size) {
-        Task task = getTaskProfile(taskid);
-        if (task == null) {
-            return null;
+    public Task updateTaskProfile(Map<String, Object> task_info) {
+
+        int taskid = Integer.parseInt((String)task_info.get("id"));
+
+        Task task = taskRepository.findByTaskid(taskid);
+        if (task != null) {
+            for (Map.Entry entry: task_info.entrySet()) {
+                if (entry.getKey().equals("id")) {
+                    continue;
+                }
+
+                switch ((String)entry.getKey()) {
+                case "name":
+                    task.setName(entry.getValue().toString());
+                    break;
+                case "description":
+                    task.setDescription((String) entry.getValue());
+                    break;
+                case "size":
+                    task.setSize((Integer)entry.getValue());
+                    break;
+                }
+            }
+            taskRepository.save(task);
         }
-        task.setName(name);
-        task.setDescription(description);
-        task.setSize(size);
-        taskRepository.save(task);
         return task;
     }
 

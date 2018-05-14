@@ -74,18 +74,15 @@ public class TaskController {
     @PatchMapping("/{id}")
     public String updateTask(@PathVariable(value = "id") String id,
         @RequestBody Map<String, Map<String, Object>> payload) {
-        JSONObject data = new JSONObject(payload.get("data"));
-        int idI = Integer.parseInt(data.getString("id"));
+        JSONObject data = new JSONObject();
+        int idI = Integer.parseInt((String) payload.get("data").get("id"));
         if (Integer.parseInt(id) != idI) {
             return null;
         }
+        taskService.updateTaskProfile(payload.get("data"));
+        data.put("data", taskService.getTaskProfile(idI));
 
-        int size = Integer.parseInt(data.getString("size"));
-
-        taskService.updateTaskProfile(idI, data.getString("name"),
-            data.getString("description"), size);
-
-        return taskService.getTaskProfile(idI).toString();
+        return data.toString();
     }
 
 

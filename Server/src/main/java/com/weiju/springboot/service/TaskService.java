@@ -3,6 +3,7 @@ package com.weiju.springboot.service;
 import com.weiju.springboot.model.Task;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 
 public interface TaskService {
 
@@ -10,7 +11,7 @@ public interface TaskService {
 
     public Task getTaskProfile(int id);
 
-    public Task updateTaskProfile(int taskid, String name, String description, int size);
+    public Task updateTaskProfile(Map<String,Object> task_info);
 
     public Iterable<Task> getTasks(int offset, int limit);
 
