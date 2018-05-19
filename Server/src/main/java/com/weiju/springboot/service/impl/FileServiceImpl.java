@@ -198,6 +198,26 @@ public class FileServiceImpl implements FileService {
     }
 
 
+    public String getBASE_PATH() {
+        return BASE_PATH;
+    }
+
+    private String getUrlheader() {
+        String port = environment.getProperty("local.server.port");
+        return "http://" + "206.189.35.98" + ":" + port + "/api/file";
+    }
+
+    /**
+     * 给定相对路径，返回可以直接访问的url
+     *
+     * @param relativePath
+     * @return
+     */
+    @Override
+    public String relativePathToUrl(String relativePath) {
+        return getUrlheader() + relativePath;
+    }
+
     @Override
     public String store(MultipartFile file, Path path) throws BaseException {
         return store(file, path, getNewFilename(file.getOriginalFilename()));
