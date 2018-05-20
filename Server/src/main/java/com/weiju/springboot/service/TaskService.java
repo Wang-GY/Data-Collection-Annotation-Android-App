@@ -1,6 +1,7 @@
 package com.weiju.springboot.service;
 
 import com.weiju.springboot.model.Task;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -13,7 +14,7 @@ public interface TaskService {
 
     public Task updateTaskProfile(Map<String,Object> task_info);
 
-    public Iterable<Task> getTasks(int offset, int limit);
+    public Page<Task> getTasks(int offset, int limit);
 
     public int applyTask(int taskid, int applyer);
 }

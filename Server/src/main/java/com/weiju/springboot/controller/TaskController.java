@@ -5,9 +5,13 @@ import com.weiju.springboot.repository.TaskRepository;
 import com.weiju.springboot.service.TaskService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -42,13 +46,44 @@ public class TaskController {
 
 
     @GetMapping("/")
-    public Iterable<Task> getTasks(@RequestParam Map<String, String> requestParams) {
-        int offset = Integer.parseInt(requestParams.get("offset"));
-        int limit = Integer.parseInt(requestParams.get("limit"));
+    public ResponseEntity<String> getTasks(@RequestParam Map<String, String> requestParams) {
+        int offset = 0;
+        int limit = 10;
+        if (requestParams.get("offset") != null) {
+            offset = Integer.parseInt(requestParams.get("offset"));
+        }
+        if (requestParams.get("limit") != null) {
+            limit = Integer.parseInt(requestParams.get("limit"));
+        }
 
-        Iterable<Task> tasks = taskService.getTasks(offset, limit);
-        return tasks;
+        Page<Task> tasks = taskService.getTasks(offset, limit);
+        List<JSONObject> tasksInfo = new LinkedList<>();
+        for (Task task: tasks) {
+            JSONObject taskJSON = new JSONObject();
+            taskJSON.put("name", task.getName());
+            taskJSON.put("id", task.getTaskid());
+            taskJSON.put("start_time", task.getStart_time());
+            taskJSON.put("type", task.getType());
+            taskJSON.put("size", task.getSize());
+            taskJSON.put("data_path", task.getData_path());
+            taskJSON.put("creator", task.getCreator().getUserid());
+            taskJSON.put("description", task.getDescription());
+            taskJSON.put("progress", task.getProgress());
+            taskJSON.put("deadline", task.getDeadline());
+            taskJSON.put("formater", task.getFormater());
+            tasksInfo.add(taskJSON);
+        }
+
+        JSONObject taskData = new JSONObject();
+        taskData.put("tasks", tasksInfo);
+        JSONObject response = new JSONObject();
+
+        response.put("data", taskData);
+
+        return new ResponseEntity<>(response.toString(), HttpStatus.OK);
     }
+
+
 
     @GetMapping("/{task_id}")
     public String getTaskById(@PathVariable(value = "task_id", required = true) String task_id) {
@@ -60,6 +95,7 @@ public class TaskController {
         taskJSON.put("start_time", task.getStart_time());
         taskJSON.put("type", task.getType());
         taskJSON.put("size", task.getSize());
+        taskJSON.put("description", task.getDescription());
         taskJSON.put("data_path", task.getData_path());
         taskJSON.put("creator", task.getCreator().getUserid());
         taskJSON.put("progress", task.getProgress());

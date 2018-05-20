@@ -4,6 +4,7 @@ import com.weiju.springboot.model.Task;
 import com.weiju.springboot.repository.TaskRepository;
 import com.weiju.springboot.repository.UserRepository;
 import com.weiju.springboot.service.TaskService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -75,7 +76,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Iterable<Task> getTasks(int offset, int limit) {
+    public Page<Task> getTasks(int offset, int limit) {
         //Pageable pageable = new PageRequest(offset, limit);
         Pageable pageable = PageRequest.of(offset, limit);
         return taskRepository.findAll(pageable);
