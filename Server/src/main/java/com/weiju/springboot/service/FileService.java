@@ -59,4 +59,6 @@ public interface FileService {
     //void deleteAll(Path path);
 
     String getNewFilename(String oldfilename);
+
+    String getFileTypeByFileName(String fileName);
 }

@@ -296,4 +296,17 @@ public class FileServiceImpl implements FileService {
     public String getNewFilename(String oldFilename) {
         return Instant.now().toString().replace(":", "-") + oldFilename;
     }
+
+
+    /**
+     * 根据文件名推断文件类型
+     *
+     * @param fileName
+     * @return
+     */
+    @Override
+    public String getFileTypeByFileName(String fileName) {
+        String[] items = fileName.split(".");
+        return items[items.length - 1];
+    }
 }

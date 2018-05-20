@@ -18,14 +18,15 @@ public class Commit {
         return commitid;
     }
 
-    public void setCommitid(int id){
+    public void setCommitid(int id) {
         commitid = id;
     }
 
     public String getCommitTime() {
         return commitTime;
     }
-    public void setCommitTime(String time){
+
+    public void setCommitTime(String time) {
         this.commitTime = time;
     }
 
@@ -70,4 +71,8 @@ public class Commit {
 
     @OneToMany(mappedBy = "commitId", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = CommitData.class)
     private List<CommitData> commitDataList;
+
+    public List<CommitData> getCommitDataList() {
+        return commitDataList;
+    }
 }

@@ -117,7 +117,7 @@ public class CommitController {
         List<String> url_list = fileService.uploadFiles(multipartFiles, "/tasks/" + id + "/pictures");
 
         for (String item : url_list) {
-            commitDataService.save(commit, item);
+            commitDataService.save(commit, fileService.getRelativePathByUrl(item));
         }
         JSONObject response = new JSONObject();
         response.put("data", url_list);
@@ -264,15 +264,19 @@ public class CommitController {
                 responseCommits.add(comitInfo);
 
                 // TODO get commit data
+
                 logger.info(comitInfo.toString());
             }
 
 
+            JSONObject responseData = new JSONObject();
             JSONObject response = new JSONObject();
             if (commits != null) { // find some commit
                 logger.info("try to put commits");
-                response.put("data", responseCommits);
+                responseData.put("commits", responseCommits);
                 logger.info("put commits into data");
+                response.put("data", responseData);
+
                 return new ResponseEntity<>(response.toString(), HttpStatus.OK);
 
             } else {
