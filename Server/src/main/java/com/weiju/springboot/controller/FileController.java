@@ -1,18 +1,12 @@
 package com.weiju.springboot.controller;
 
 import com.weiju.springboot.exception.BaseException;
-import com.weiju.springboot.model.DataMetaErr;
 import com.weiju.springboot.service.FileService;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
-import org.springframework.core.io.FileUrlResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,16 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 上传文件和获取文件
@@ -56,7 +43,7 @@ public class FileController {
      * 相对于/data
      * 根据相对路径+文件名获取文件
      *
-     * @param filePath 文件相对路径
+     * @param filePath 文件相对路径 example: tasks/2/pictures/2018-05-11T08-47-54.748920900Z20170722210518.jpg
      * @return Resource
      * @throws BaseException
      */

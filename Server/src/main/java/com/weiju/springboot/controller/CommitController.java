@@ -15,13 +15,18 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
+import java.net.Inet4Address;
 import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -185,13 +190,13 @@ public class CommitController {
 
                 // construct xml path
                 relativePath = fileService.getParentPath(relativePath);
-                logger.info("picture parent path: " + relativePath );
-                relativePath = relativePath.replace("pictures","xmls");// change directory
+                logger.info("picture parent path: " + relativePath);
+                relativePath = relativePath.replace("pictures", "xmls");// change directory
                 relativePath = relativePath + "/" + pictureName;
 
                 logger.info(" xml  path :" + relativePath);
                 String xmlName = fileService.getNewFilename("-" + String.valueOf(committer_id) + ".xml");
-                logger.info("xmlName: " + xmlName );
+                logger.info("xmlName: " + xmlName);
                 fileService.storeString(xml, xmlName, relativePath);
                 // save commit data
                 commitDataService.save(commit, relativePath + "/" + xmlName);
@@ -210,6 +215,7 @@ public class CommitController {
 
     /**
      * 给定userid,task_id,limit 返回
+     * api: get user commits
      *
      * @param userid
      * @param task_id
@@ -217,14 +223,65 @@ public class CommitController {
      * @return
      */
     @GetMapping()
-    public ResponseEntity<String> getUserCommits(@RequestParam(name = "user", required = false) int userid,
-                                                 @RequestParam(name = "task", required = false) int task_id,
-                                                 @RequestParam(name = "limit", required = false) int limit,
+    public ResponseEntity<String> getUserCommits(@RequestParam(name = "user", required = false, defaultValue = "") String userid,
+                                                 @RequestParam(name = "task", required = false, defaultValue = "") String task_id,
+                                                 @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
                                                  @RequestParam(name = "offset", required = false, defaultValue = "1") int offset
-    ) {
+    ) throws BaseException {
 
 
-        return null;
+        try {
+            User user = null;
+            Task task = null;
+            Page<Commit> commits;
+            if (!userid.equals(""))
+                user = userRepository.findByUserid(Integer.parseInt(userid));
+            if (!task_id.equals(""))
+                task = taskRepository.findByTaskid(Integer.parseInt(task_id));
+            if (user != null && task != null) {
+                //commits = commitRepository.findByCommitterAndAndTask(user, task);
+                logger.info("findByCommitterAndAndTask");
+                commits = commitService.findByCommitterAndAndTask(user, task, limit, offset);
+            } else if (user != null) {
+                //commits = commitRepository.findByCommitter(user);
+                logger.info("findByCommitter");
+                commits = commitService.findByCommitter(user, limit, offset);
+            } else {
+                //commits = commitRepository.findByTask(task);
+                logger.info("findByTask");
+                commits = commitService.findByTask(task, limit, offset);
+
+            }
+
+            List<JSONObject> responseCommits = new LinkedList<>();
+
+            // put commit info into response
+            for (Commit commit : commits) {
+                JSONObject comitInfo = new JSONObject();
+                comitInfo.put("id", commit.getCommitid());
+                comitInfo.put("task_id", commit.getTask().getTaskid());
+                comitInfo.put("committer_id", commit.getCommitter().getUserid());
+                responseCommits.add(comitInfo);
+
+                // TODO get commit data
+                logger.info(comitInfo.toString());
+            }
+
+
+            JSONObject response = new JSONObject();
+            if (commits != null) { // find some commit
+                logger.info("try to put commits");
+                response.put("data", responseCommits);
+                logger.info("put commits into data");
+                return new ResponseEntity<>(response.toString(), HttpStatus.OK);
+
+            } else {
+                return null;
+            }
+        } catch (NumberFormatException e) {
+            throw new BaseException("Number formet exception", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
+
     }
 
 

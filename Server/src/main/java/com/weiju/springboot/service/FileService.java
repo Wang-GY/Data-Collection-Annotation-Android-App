@@ -35,6 +35,8 @@ public interface FileService {
 
     String getFilenameByUrl(String url);
 
+    String relativePathToUrl(String relativePath);
+
     /**
      * File
      * path 存放文件的目录 /xxx
@@ -45,16 +47,16 @@ public interface FileService {
 
     MediaType getFileType(String filePath) throws IOException;
 
-    Stream<Path> loadAll(Path path) throws BaseException;
+    //Stream<Path> loadAll(Path path) throws BaseException;
 
 
     Path load(Path path, String filename);
 
 
-    Resource loadAsResource(Path path, String filename) throws BaseException;
+    //Resource loadAsResource(Path path, String filename) throws BaseException;
 
 
-    void deleteAll(Path path);
+    //void deleteAll(Path path);
 
     String getNewFilename(String oldfilename);
 }

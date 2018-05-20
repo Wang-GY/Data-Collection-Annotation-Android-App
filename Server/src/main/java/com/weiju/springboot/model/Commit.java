@@ -18,6 +18,9 @@ public class Commit {
         return commitid;
     }
 
+    public void setCommitid(int id){
+        commitid = id;
+    }
 
     public String getCommitTime() {
         return commitTime;

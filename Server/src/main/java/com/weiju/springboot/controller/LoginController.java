@@ -2,7 +2,6 @@ package com.weiju.springboot.controller;
 
 
 import com.weiju.springboot.exception.BaseException;
-import com.weiju.springboot.model.DataMetaErr;
 import com.weiju.springboot.model.User;
 import com.weiju.springboot.repository.UserRepository;
 import com.weiju.springboot.service.UserService;

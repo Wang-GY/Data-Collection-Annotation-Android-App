@@ -253,6 +253,7 @@ public class FileServiceImpl implements FileService {
         return new MediaType(type, subtype);
     }
 
+    /*
     @Override
     public Stream<Path> loadAll(Path path) throws BaseException {
         try {
@@ -262,12 +263,14 @@ public class FileServiceImpl implements FileService {
             throw new BaseException("Fileed to read stored files", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    */
 
     @Override
     public Path load(Path path, String filename) {
         return path.resolve(filename);
     }
 
+    /*
     @Override
     public Resource loadAsResource(Path path, String filename) throws BaseException {
         try {
@@ -288,7 +291,7 @@ public class FileServiceImpl implements FileService {
     public void deleteAll(Path path) {
         FileSystemUtils.deleteRecursively(path.toFile());
     }
-
+    */
     @Override
     public String getNewFilename(String oldFilename) {
         return Instant.now().toString().replace(":", "-") + oldFilename;

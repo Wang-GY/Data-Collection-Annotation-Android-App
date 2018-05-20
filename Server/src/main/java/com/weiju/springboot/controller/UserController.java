@@ -1,7 +1,5 @@
 package com.weiju.springboot.controller;
 
-import com.weiju.springboot.exception.BaseException;
-import com.weiju.springboot.model.DataMetaErr;
 import com.weiju.springboot.model.User;
 import com.weiju.springboot.repository.UserRepository;
 import org.json.JSONObject;
@@ -56,21 +54,22 @@ public class UserController {
 
     //获取用户信息
     @GetMapping(value = "/{id}")
-    public DataMetaErr getUserProfile(@PathVariable("id") int userid) {
+    public ResponseEntity<String> getUserProfile(@PathVariable("id") int userid) {
         User user = userService.getUserProfile(userid);
-        DataMetaErr response = new DataMetaErr();
-        response.setData(user);
-        return response;
+        //DataMetaErr response = new DataMetaErr();
+        JSONObject response = new JSONObject();
+        response.put("data", user);
+        return new ResponseEntity<>(response.toString(), HttpStatus.OK);
 
     }
 
     //更新用户信息
     @PatchMapping(value = "/{id}")
-    public DataMetaErr updateUserProfile(@PathVariable("id") int userid, @RequestBody DataMetaErr payload) throws Exception {
-        Map<String, Object> user_data = (Map<String, Object>) payload.getData();
+    public ResponseEntity<String> updateUserProfile(@PathVariable("id") int userid, @RequestBody Map<String, Object> payload) throws Exception {
+        Map<String, Object> user_data = (Map<String, Object>) payload.get("data");
         User updated_user = userService.updateUser(user_data);
-        DataMetaErr user_info = new DataMetaErr();
-        user_info.setData(updated_user);
-        return user_info;
+        JSONObject response = new JSONObject();
+        response.put("data", updated_user);
+        return new ResponseEntity<>(response.toString(), HttpStatus.OK);
     }
 }
