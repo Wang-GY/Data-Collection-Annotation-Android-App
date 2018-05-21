@@ -23,9 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import java.net.Inet4Address;
-import java.time.Instant;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +131,7 @@ public class CommitController {
         try {
 
             Integer task_id = (Integer) commit_data.get("task_id");
-            Integer committer_id = (Integer) commit_data.get("committer_id");
+            Integer committer_id = (Integer) commit_data.get("user_id");
             Integer size = (Integer) commit_data.get("size");
 
             if (task_id == null || committer_id == null || size == null) {
@@ -147,7 +144,7 @@ public class CommitController {
             // construct response data meta error format
             JSONObject response = new JSONObject();
             JSONObject data = new JSONObject();
-            data.put("commitid", commit.getCommitid());
+            data.put("commit_id", commit.getCommitid());
             response.put("data", data);
 
             return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
@@ -168,12 +165,12 @@ public class CommitController {
     private ResponseEntity<String> uploadAnnotationCommit(Map<String, Object> commit_data) throws BaseException {
         try {
             Integer task_id = (Integer) commit_data.get("task_id");
-            Integer committer_id = (Integer) commit_data.get("committer_id");
+            Integer committer_id = (Integer) commit_data.get("user_id");
             Integer size = (Integer) commit_data.get("size");
             List<Map<String, String>> results = (List<Map<String, String>>) commit_data.get("result");
 
             if (task_id == null || committer_id == null || size == null || results == null) {
-                throw new BaseException("json key error: task_id or committer_id or size or result not found", HttpStatus.NOT_FOUND);
+                throw new BaseException("json key error: task_id or user_id or size or result not found", HttpStatus.NOT_FOUND);
             }
 
             Commit commit = commitService.save(task_id, committer_id, size);
@@ -260,7 +257,7 @@ public class CommitController {
                 JSONObject comitInfo = new JSONObject();
                 comitInfo.put("id", commit.getCommitid());
                 comitInfo.put("task_id", commit.getTask().getTaskid());
-                comitInfo.put("committer_id", commit.getCommitter().getUserid());
+                comitInfo.put("user_id", commit.getCommitter().getUserid());
                 responseCommits.add(comitInfo);
 
                 // TODO get commit data
@@ -283,7 +280,7 @@ public class CommitController {
                 return null;
             }
         } catch (NumberFormatException e) {
-            throw new BaseException("Number formet exception", HttpStatus.INTERNAL_SERVER_ERROR, e);
+            throw new BaseException("Number format exception", HttpStatus.INTERNAL_SERVER_ERROR, e);
         }
 
     }

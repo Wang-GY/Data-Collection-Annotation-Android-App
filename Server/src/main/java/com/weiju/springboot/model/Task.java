@@ -37,8 +37,8 @@ public class Task {
     @Column(name = "progress")
     private String progress;
 
-    @Column(name = "formater")
-    private String formater;
+    @Column(name = "formatter")
+    private String formatter;
 
     @Column(name = "deadline")
     private String deadline;
@@ -103,16 +103,16 @@ public class Task {
         this.size = size;
     }
 
-    public void setFormater(String formater) {
-        this.formater = formater;
+    public void setFormatter(String formatter) {
+        this.formatter = formatter;
     }
 
     public void setStart_time(String start_time) {
         this.start_time = start_time;
     }
 
-    public String getFormater() {
-        return formater;
+    public String getFormatter() {
+        return formatter;
     }
 
     public String getProgress() {

@@ -30,7 +30,7 @@ public class TaskServiceImpl implements TaskService {
     public Task createTask(int uuid, String formater, String title, String start_time, String deadline,
         String description, int type) {
         Task task = new Task();
-        task.setFormater(formater);
+        task.setFormatter(formater);
         task.setName(title);
         task.setCreator(userRepository.findByUserid(uuid));
         task.setStart_time(start_time);

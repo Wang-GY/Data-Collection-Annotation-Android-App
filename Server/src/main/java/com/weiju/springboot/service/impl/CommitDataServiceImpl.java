@@ -69,6 +69,7 @@ public class CommitDataServiceImpl implements CommitDataService {
         for (CommitData commitData : commitDataList) {
             String itemPath = commitData.getItemPath(); // relative Path
             String fileName = fileService.getFilenameByRelativePath(itemPath);
+            //TODO xml to json
             if (fileService.getFileTypeByFileName(fileName).equals("xml")) {
                 result.put("xml", fileService.relativePathToUrl(itemPath));
                 result.put("picture", "");

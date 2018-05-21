@@ -70,7 +70,7 @@ public class TaskController {
             taskJSON.put("description", task.getDescription());
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
-            taskJSON.put("formater", task.getFormater());
+            taskJSON.put("formater", task.getFormatter());
             tasksInfo.add(taskJSON);
         }
 
@@ -100,7 +100,8 @@ public class TaskController {
         taskJSON.put("creator", task.getCreator().getUserid());
         taskJSON.put("progress", task.getProgress());
         taskJSON.put("deadline", task.getDeadline());
-        taskJSON.put("formater", task.getFormater());
+        //TODO formater to formatter
+        taskJSON.put("formater", task.getFormatter());
 
         payload.put("data", taskJSON);
         return payload.toString();
