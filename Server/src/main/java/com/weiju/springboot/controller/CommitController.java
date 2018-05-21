@@ -142,8 +142,8 @@ public class CommitController {
             // find by commit_id
             // Commit commit = commitService.save(task_id, committer_id, size);
             Commit commit = commitRepository.findByCommitid(commit_id);
-            if (commit == null){
-                throw new BaseException("commit_id not found",HttpStatus.NOT_FOUND);
+            if (commit == null) {
+                throw new BaseException("commit_id not found", HttpStatus.NOT_FOUND);
             }
 
             // construct response data meta error format
@@ -182,8 +182,8 @@ public class CommitController {
             //Commit commit = commitService.save(task_id, committer_id, size);
             Commit commit = commitRepository.findByCommitid(commit_id);
 
-            if (commit == null){
-                throw new BaseException("commit_id not found",HttpStatus.NOT_FOUND);
+            if (commit == null) {
+                throw new BaseException("commit_id not found", HttpStatus.NOT_FOUND);
             }
 
             for (Map<String, String> result : results) {
@@ -218,7 +218,7 @@ public class CommitController {
 
         }
 
-        return null;
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     /**
@@ -266,7 +266,7 @@ public class CommitController {
             // put commit info into response
             for (Commit commit : commits) {
                 JSONObject comitInfo = new JSONObject();
-                comitInfo.put("id", commit.getCommitid());
+                comitInfo.put("commit_id", commit.getCommitid());
                 comitInfo.put("task_id", commit.getTask().getTaskid());
                 comitInfo.put("user_id", commit.getCommitter().getUserid());
                 responseCommits.add(comitInfo);
