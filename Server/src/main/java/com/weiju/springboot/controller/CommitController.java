@@ -133,13 +133,18 @@ public class CommitController {
             Integer task_id = (Integer) commit_data.get("task_id");
             Integer committer_id = (Integer) commit_data.get("user_id");
             Integer size = (Integer) commit_data.get("size");
+            Integer commit_id = (Integer) commit_data.get("commit_id");
 
             if (task_id == null || committer_id == null || size == null) {
                 throw new BaseException("json key error: task_id or committer_id or size not found", HttpStatus.NOT_FOUND);
             }
 
-
-            Commit commit = commitService.save(task_id, committer_id, size);
+            // find by commit_id
+            // Commit commit = commitService.save(task_id, committer_id, size);
+            Commit commit = commitRepository.findByCommitid(commit_id);
+            if (commit == null){
+                throw new BaseException("commit_id not found",HttpStatus.NOT_FOUND);
+            }
 
             // construct response data meta error format
             JSONObject response = new JSONObject();
@@ -167,36 +172,42 @@ public class CommitController {
             Integer task_id = (Integer) commit_data.get("task_id");
             Integer committer_id = (Integer) commit_data.get("user_id");
             Integer size = (Integer) commit_data.get("size");
+            Integer commit_id = (Integer) commit_data.get("commit_id");
             List<Map<String, String>> results = (List<Map<String, String>>) commit_data.get("result");
 
             if (task_id == null || committer_id == null || size == null || results == null) {
                 throw new BaseException("json key error: task_id or user_id or size or result not found", HttpStatus.NOT_FOUND);
             }
 
-            Commit commit = commitService.save(task_id, committer_id, size);
+            //Commit commit = commitService.save(task_id, committer_id, size);
+            Commit commit = commitRepository.findByCommitid(commit_id);
+
+            if (commit == null){
+                throw new BaseException("commit_id not found",HttpStatus.NOT_FOUND);
+            }
 
             for (Map<String, String> result : results) {
                 String picture_url = result.get("picture_url");
-                String xml = result.get("xml");
-                if (picture_url == null || xml == null) {
-                    throw new BaseException("json key error: picture_url or xml not found", HttpStatus.NOT_FOUND);
+                String annotation_json = result.get("annotation_json");
+                if (picture_url == null || annotation_json == null) {
+                    throw new BaseException("json key error: picture_url or annotation_json not found", HttpStatus.NOT_FOUND);
                 }
                 String relativePath = fileService.getRelativePathByUrl(picture_url);
                 logger.info("picture path : " + relativePath);
                 String pictureName = fileService.getFilenameByRelativePath(relativePath);
 
-                // construct xml path
+                // construct annotation_json path
                 relativePath = fileService.getParentPath(relativePath);
                 logger.info("picture parent path: " + relativePath);
-                relativePath = relativePath.replace("pictures", "xmls");// change directory
+                relativePath = relativePath.replace("pictures", "annotations");// change directory
                 relativePath = relativePath + "/" + pictureName;
 
-                logger.info(" xml  path :" + relativePath);
-                String xmlName = fileService.getNewFilename("-" + String.valueOf(committer_id) + ".xml");
-                logger.info("xmlName: " + xmlName);
-                fileService.storeString(xml, xmlName, relativePath);
+                logger.info(" annotation  path :" + relativePath);
+                String jsonName = fileService.getNewFilename("-" + String.valueOf(committer_id) + ".json");
+                logger.info("annotation_jsonName: " + jsonName);
+                fileService.storeString(annotation_json, jsonName, relativePath);
                 // save commit data
-                commitDataService.save(commit, relativePath + "/" + xmlName);
+                commitDataService.save(commit, relativePath + "/" + jsonName);
 
             }
 

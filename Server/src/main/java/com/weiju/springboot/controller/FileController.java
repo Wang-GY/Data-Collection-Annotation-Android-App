@@ -116,14 +116,14 @@ public class FileController {
      *
      * @param taskid
      * @param pictureName
-     * @param xmlName
+     * @param jsonName
      * @return
      */
-    @GetMapping(value = "/tasks/{taskid}/xmls/{pictureName}/{xmlName}")
-    public ResponseEntity<Resource> getXMLFIle(@PathVariable("taskid") String taskid,
-                                               @PathVariable("pictureName") String pictureName,
-                                               @PathVariable("xmlName") String xmlName) throws BaseException {
-        String filepath = Paths.get("tasks/" + taskid + "/xmls/" + pictureName + "/" + xmlName).toString();
+    @GetMapping(value = "/tasks/{taskid}/annotations/{pictureName}/{jsonName}")
+    public ResponseEntity<Resource> getAnnotationFile(@PathVariable("taskid") String taskid,
+                                                      @PathVariable("pictureName") String pictureName,
+                                                      @PathVariable("jsonName") String jsonName) throws BaseException {
+        String filepath = Paths.get("tasks/" + taskid + "/annotations/" + pictureName + "/" + jsonName).toString();
         return getFile(filepath);
     }
 
