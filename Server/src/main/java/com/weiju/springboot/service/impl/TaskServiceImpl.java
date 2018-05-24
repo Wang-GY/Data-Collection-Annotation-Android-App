@@ -4,12 +4,20 @@ import com.weiju.springboot.model.Task;
 import com.weiju.springboot.repository.TaskRepository;
 import com.weiju.springboot.repository.UserRepository;
 import com.weiju.springboot.service.TaskService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 @Service("Task srevice")
@@ -20,10 +28,18 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
 
     private final UserRepository userRepository;
-    public TaskServiceImpl(JdbcTemplate jdbcTemplate, TaskRepository taskRepository, UserRepository userRepository) {
+
+    private static FileSystem fs = FileSystems.getDefault();
+
+    @Autowired
+    private final Environment environment;
+
+    public TaskServiceImpl(JdbcTemplate jdbcTemplate, TaskRepository taskRepository,
+        UserRepository userRepository, Environment environment) {
         this.jdbcTemplate = jdbcTemplate;
         this.taskRepository = taskRepository;
-        this. userRepository = userRepository;
+        this.userRepository = userRepository;
+        this.environment = environment;
     }
 
     @Override
@@ -82,12 +98,31 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findAll(pageable);
     }
 
+
     @Override
-    public int applyTask(int taskid, int applyer) {
-        Task task = getTaskProfile(taskid);
-        if (task == null) {
-            return -1;
+    public List<String> getPicsByTaskId(int task_id){
+        String basePath = Paths.get(".").toAbsolutePath().normalize().toString();
+        String picPath = basePath + fs.getSeparator() + "data" + fs.getSeparator() + "tasks"
+            + fs.getSeparator() + task_id + fs.getSeparator() + "pictures";
+
+        File folder = new File(picPath);
+        File[] files = folder.listFiles();
+        List<String> fileURIs = new LinkedList<>();
+
+        String port = environment.getProperty("local.server.port");
+
+
+        if (files != null) {
+            for (File file: files) {
+                if (file.isFile()) {
+                    fileURIs.add("http://" + "206.189.35.98" + ":" + port + "/api/tasks/" + task_id
+                        + "/pictures/" + file.getName()
+                    );
+                }
+
+            }
         }
-        return 0;
+        return  fileURIs;
     }
+
 }
