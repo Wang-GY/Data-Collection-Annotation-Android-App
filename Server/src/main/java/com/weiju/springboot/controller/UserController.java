@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.weiju.springboot.service.UserService;
 
+import javax.management.ObjectName;
+import javax.xml.soap.SAAJResult;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
@@ -53,23 +56,23 @@ public class UserController {
     }
 
     //获取用户信息
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<String> getUserProfile(@PathVariable("id") int userid) {
+    @GetMapping(value = "/{id}/")
+    public ResponseEntity<Object> getUserProfile(@PathVariable("id") int userid) {
+        logger.info("get user info : " + String.valueOf(userid));
         User user = userService.getUserProfile(userid);
-        //DataMetaErr response = new DataMetaErr();
-        JSONObject response = new JSONObject();
-        response.put("data", user);
-        return new ResponseEntity<>(response.toString(), HttpStatus.OK);
+        Map<String,Object> res = new LinkedHashMap<>();
+        res.put("data",user);
+        return new ResponseEntity<>(res, HttpStatus.OK);
 
     }
 
     //更新用户信息
-    @PatchMapping(value = "/{id}")
-    public ResponseEntity<String> updateUserProfile(@PathVariable("id") int userid, @RequestBody Map<String, Object> payload) throws Exception {
+    @PatchMapping(value = "/{id}/")
+    public ResponseEntity<Object> updateUserProfile(@PathVariable("id") int userid, @RequestBody Map<String, Object> payload) throws Exception {
         Map<String, Object> user_data = (Map<String, Object>) payload.get("data");
         User updated_user = userService.updateUser(user_data);
-        JSONObject response = new JSONObject();
+        Map<String,Object> response = new LinkedHashMap<>();
         response.put("data", updated_user);
-        return new ResponseEntity<>(response.toString(), HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
