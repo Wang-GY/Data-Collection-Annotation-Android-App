@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -76,8 +78,25 @@ public class TaskController {
         if (requestParams.get("limit") != null) {
             limit = Integer.parseInt(requestParams.get("limit"));
         }
+        JSONObject response = new JSONObject();
+        JSONObject taskData = new JSONObject();
 
-        Page<Task> tasks = taskService.getTasks(offset, limit);
+        Pageable pageable = PageRequest.of(offset, limit);
+        //System.out.println(pageable.next().toString());
+
+
+        if (((PageRequest) pageable).previous() != null) {
+            response.put("previous", "http://206.189.35.98:12000/api/tasks/?offset="
+                + ((PageRequest) pageable).previous().getPageNumber() +
+                "&limit=" + ((PageRequest) pageable).previous().getOffset());
+        }
+        if (pageable.next() != null) {
+            response.put("next", "http://206.189.35.98:12000/api/tasks/?offset="
+                + pageable.next().getPageNumber() +
+                "&limit=" + pageable.next().getOffset());
+        }
+
+        Page<Task> tasks = taskRepository.findAll(pageable);
         List<JSONObject> tasksInfo = new LinkedList<>();
         for (Task task: tasks) {
             JSONObject taskJSON = new JSONObject();
@@ -95,11 +114,10 @@ public class TaskController {
             tasksInfo.add(taskJSON);
         }
 
-        JSONObject taskData = new JSONObject();
-        taskData.put("tasks", tasksInfo);
-        JSONObject response = new JSONObject();
 
+        taskData.put("tasks", tasksInfo);
         response.put("data", taskData);
+        //response.put("next", tasks.nextPageable().toString());
 
         return new ResponseEntity<>(response.toString(), HttpStatus.OK);
     }
@@ -107,60 +125,82 @@ public class TaskController {
 
 
     @GetMapping("/{task_id}")
-    public String getTaskById(@PathVariable(value = "task_id", required = true) String task_id) {
+    public ResponseEntity<String> getTaskById(@PathVariable(value = "task_id", required = true) String task_id) {
         JSONObject payload = new JSONObject();
-        Task task = taskService.getTaskProfile(Integer.parseInt(task_id));
-
-        String basePath = Paths.get(".").toAbsolutePath().normalize().toString();
-        String picPath = basePath + fs.getSeparator() + "data" + fs.getSeparator() + "tasks"
-           + fs.getSeparator() + task_id + fs.getSeparator() + "pictures";
-        //logger.info(picPath);
-        File folder = new File(picPath);
-        File[] files = folder.listFiles();
-        List<String> fileURIs = new LinkedList<>();
-
-        String port = environment.getProperty("local.server.port");
-
-        for (File file: files) {
-            if (file.isFile()) {
-                fileURIs.add("http://" + "206.189.35.98" + ":" + port + "/api/tasks/" + task_id
-                    + "/pictures/" + file.getName()
-                );
-            }
-            logger.info(file.getName());
-        }
-
         JSONObject taskJSON = new JSONObject();
-        taskJSON.put("name", task.getName());
-        taskJSON.put("id", task.getTaskid());
-        taskJSON.put("start_time", task.getStart_time());
-        taskJSON.put("type", task.getType());
-        taskJSON.put("size", task.getSize());
-        taskJSON.put("description", task.getDescription());
-        taskJSON.put("data_path", task.getData_path());
-        taskJSON.put("creator", task.getCreator().getUserid());
-        taskJSON.put("progress", task.getProgress());
-        taskJSON.put("deadline", task.getDeadline());
-        taskJSON.put("pictures", fileURIs);
-        //TODO formater to formatter
-        taskJSON.put("formatter", task.getFormatter());
+        Task task = taskService.getTaskProfile(Integer.parseInt(task_id));
+        if (task != null) {
+            String basePath = Paths.get(".").toAbsolutePath().normalize().toString();
+            String picPath = basePath + fs.getSeparator() + "data" + fs.getSeparator() + "tasks"
+                + fs.getSeparator() + task_id + fs.getSeparator() + "pictures";
+            //logger.info(picPath);
+            File folder = new File(picPath);
+            File[] files = folder.listFiles();
+            List<String> fileURIs = new LinkedList<>();
+            String port = environment.getProperty("local.server.port");
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        fileURIs.add(
+                            "http://" + "206.189.35.98" + ":" + port + "/api/file/tasks/" + task_id + "/pictures/" + file.getName());
+                    }
+                    logger.info(file.getName());
+                }
+            }
+            taskJSON.put("name", task.getName());
+            taskJSON.put("id", task.getTaskid());
+            taskJSON.put("start_time", task.getStart_time());
+            taskJSON.put("type", task.getType());
+            taskJSON.put("size", task.getSize());
+            taskJSON.put("description", task.getDescription());
+            taskJSON.put("data_path", task.getData_path());
+            taskJSON.put("creator", task.getCreator().getUserid());
+            taskJSON.put("progress", task.getProgress());
+            taskJSON.put("deadline", task.getDeadline());
+            taskJSON.put("pictures", fileURIs);
+            //TODO formater to formatter
+            taskJSON.put("formatter", task.getFormatter());
 
-        payload.put("data", taskJSON);
-        return payload.toString();
+            payload.put("data", taskJSON);
+            return new ResponseEntity<>(payload.toString(), HttpStatus.OK);
+        }
+        taskJSON.put("title", "No such task.");
+        taskJSON.put("detail", "No such task.");
+
+        payload.put("error", taskJSON);
+        return new ResponseEntity<>(payload.toString(), HttpStatus.NOT_FOUND);
+
     }
 
     @PatchMapping("/{id}")
-    public String updateTask(@PathVariable(value = "id") String id,
+    public ResponseEntity<String> updateTask(@PathVariable(value = "id") String id,
         @RequestBody Map<String, Map<String, Object>> payload) {
         JSONObject data = new JSONObject();
         int idI = Integer.parseInt((String) payload.get("data").get("id"));
         if (Integer.parseInt(id) != idI) {
-            return null;
+            return new ResponseEntity<>("{\"error\", \"Bad Request\"", HttpStatus.BAD_REQUEST);
         }
-        taskService.updateTaskProfile(payload.get("data"));
-        data.put("data", taskService.getTaskProfile(idI));
+        Task task = taskService.updateTaskProfile(payload.get("data"));
+        if (task != null) {
+            JSONObject taskJSON = new JSONObject();
+            taskJSON.put("name", task.getName());
+            taskJSON.put("id", task.getTaskid());
+            taskJSON.put("start_time", task.getStart_time());
+            taskJSON.put("type", task.getType());
+            taskJSON.put("size", task.getSize());
+            taskJSON.put("description", task.getDescription());
+            taskJSON.put("data_path", task.getData_path());
+            taskJSON.put("creator", task.getCreator().getUserid());
+            taskJSON.put("progress", task.getProgress());
+            taskJSON.put("deadline", task.getDeadline());
+            //TODO formater to formatter
+            taskJSON.put("formatter", task.getFormatter());
+            data.put("data", taskJSON);
+        } else {
+            return new ResponseEntity<>("{\"error\": \"Data not Found\"}",HttpStatus.NOT_FOUND);
+        }
 
-        return data.toString();
+        return new ResponseEntity<>(data.toString(), HttpStatus.OK);
     }
 
     @PostMapping("/apply")

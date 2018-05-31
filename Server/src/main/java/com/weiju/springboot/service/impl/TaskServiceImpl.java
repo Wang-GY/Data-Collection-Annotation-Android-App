@@ -95,6 +95,7 @@ public class TaskServiceImpl implements TaskService {
     public Page<Task> getTasks(int offset, int limit) {
         //Pageable pageable = new PageRequest(offset, limit);
         Pageable pageable = PageRequest.of(offset, limit);
+        System.out.println(pageable.next().toString());
         return taskRepository.findAll(pageable);
     }
 
