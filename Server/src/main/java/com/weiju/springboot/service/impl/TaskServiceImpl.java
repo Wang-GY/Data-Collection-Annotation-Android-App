@@ -65,7 +65,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task updateTaskProfile(Map<String, Object> task_info) {
 
-        int taskid = Integer.parseInt((String) task_info.get("id"));
+        int taskid = (Integer) task_info.get("id");
 
         Task task = taskRepository.findByTaskid(taskid);
         if (task != null) {
