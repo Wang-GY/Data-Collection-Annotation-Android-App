@@ -1,5 +1,6 @@
 package com.weiju.springboot.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;
@@ -49,10 +50,12 @@ public class User {
 
 
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Task.class)
+    @JsonIgnore
     private List<Task> tasks; // user tasks
 
     //mappedBy : model 层定义的变量，不是数据库的字段
     @OneToMany(mappedBy = "committer", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Commit.class)
+    @JsonIgnore
     private List<Commit> commits;
 
 

@@ -60,8 +60,10 @@ public class UserController {
     public ResponseEntity<Object> getUserProfile(@PathVariable("id") int userid) {
         logger.info("get user info : " + String.valueOf(userid));
         User user = userService.getUserProfile(userid);
+
         Map<String,Object> res = new LinkedHashMap<>();
-        res.put("data",user);
+        res.put("data", user);
+        logger.info("construct response");
         return new ResponseEntity<>(res, HttpStatus.OK);
 
     }
@@ -71,7 +73,7 @@ public class UserController {
     public ResponseEntity<Object> updateUserProfile(@PathVariable("id") int userid, @RequestBody Map<String, Object> payload) throws Exception {
         Map<String, Object> user_data = (Map<String, Object>) payload.get("data");
         User updated_user = userService.updateUser(user_data);
-        Map<String,Object> response = new LinkedHashMap<>();
+        Map<String, Object> response = new LinkedHashMap<>();
         response.put("data", updated_user);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

@@ -1,5 +1,7 @@
 package com.weiju.springboot.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -45,6 +47,7 @@ public class Task {
 
     //mappedBy : model 层定义的变量，不是数据库的字段
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Commit.class)
+    @JsonIgnore
     private List<Commit> commits;
 
     public List<Commit> getCommits(){
