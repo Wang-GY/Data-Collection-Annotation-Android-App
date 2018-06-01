@@ -69,7 +69,7 @@ public class TaskController {
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
-
+    // TODO fix this
     @GetMapping("/")
     public ResponseEntity<String> getTasks(@RequestParam Map<String, String> requestParams) {
         int offset = 0;
@@ -155,12 +155,13 @@ public class TaskController {
             taskJSON.put("size", task.getSize());
             taskJSON.put("description", task.getDescription());
             taskJSON.put("data_path", task.getData_path());
-            taskJSON.put("creator", task.getCreator().getUserid());
+            // user_id : creator
+            taskJSON.put("user_id", task.getCreator().getUserid());
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
             taskJSON.put("pictures", fileURIs);
             //TODO formater to formatter
-            taskJSON.put("formatter", task.getFormatter());
+            taskJSON.put("formatter", new JSONObject(task.getFormatter()));
 
             payload.put("data", taskJSON);
             return new ResponseEntity<>(payload.toString(), HttpStatus.OK);
@@ -173,6 +174,7 @@ public class TaskController {
 
     }
 
+    // TODO fix this
     @PatchMapping("/{id}")
     public ResponseEntity<String> updateTask(@PathVariable(value = "id") String id,
                                              @RequestBody Map<String, Map<String, Object>> payload) {
@@ -204,8 +206,10 @@ public class TaskController {
         return new ResponseEntity<>(data.toString(), HttpStatus.OK);
     }
 
-    @PostMapping("/apply")
+    // TODO fix this api: 卡住不动
+    @PostMapping("/apply/")
     public ResponseEntity<String> applyTask(@RequestBody Map<String, Map<String, Object>> payload) {
+        logger.info("user try to apply a task");
         Map<String, Object> data = payload.get("data");
         int task_id = (Integer) data.get("task_id");
         int user_id = (Integer) data.get("user_id");
