@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface TaskService {
 
-    public Task createTask(int uuid, String formater, String title, String start, String deadline, String description, int type);
+    public Task createTask(int user_id, String formater, String title, String start, String deadline, String description, int type);
 
     public Task getTaskProfile(int id);
 

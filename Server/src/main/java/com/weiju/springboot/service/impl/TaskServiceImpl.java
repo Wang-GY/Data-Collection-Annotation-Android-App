@@ -35,7 +35,7 @@ public class TaskServiceImpl implements TaskService {
     private final Environment environment;
 
     public TaskServiceImpl(JdbcTemplate jdbcTemplate, TaskRepository taskRepository,
-        UserRepository userRepository, Environment environment) {
+                           UserRepository userRepository, Environment environment) {
         this.jdbcTemplate = jdbcTemplate;
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
@@ -43,12 +43,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task createTask(int uuid, String formater, String title, String start_time, String deadline,
-        String description, int type) {
+    public Task createTask(int user_id, String formater, String title, String start_time, String deadline,
+                           String description, int type) {
         Task task = new Task();
         task.setFormatter(formater);
         task.setName(title);
-        task.setCreator(userRepository.findByUserid(uuid));
+        task.setCreator(userRepository.findByUserid(user_id));
         task.setStart_time(start_time);
         task.setDeadline(deadline);
         task.setDescription(description);
@@ -65,25 +65,25 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task updateTaskProfile(Map<String, Object> task_info) {
 
-        int taskid = Integer.parseInt((String)task_info.get("id"));
+        int taskid = Integer.parseInt((String) task_info.get("id"));
 
         Task task = taskRepository.findByTaskid(taskid);
         if (task != null) {
-            for (Map.Entry entry: task_info.entrySet()) {
+            for (Map.Entry entry : task_info.entrySet()) {
                 if (entry.getKey().equals("id")) {
                     continue;
                 }
 
-                switch ((String)entry.getKey()) {
-                case "name":
-                    task.setName(entry.getValue().toString());
-                    break;
-                case "description":
-                    task.setDescription((String) entry.getValue());
-                    break;
-                case "size":
-                    task.setSize((Integer)entry.getValue());
-                    break;
+                switch ((String) entry.getKey()) {
+                    case "name":
+                        task.setName(entry.getValue().toString());
+                        break;
+                    case "description":
+                        task.setDescription((String) entry.getValue());
+                        break;
+                    case "size":
+                        task.setSize((Integer) entry.getValue());
+                        break;
                 }
             }
             taskRepository.save(task);
@@ -101,10 +101,10 @@ public class TaskServiceImpl implements TaskService {
 
 
     @Override
-    public List<String> getPicsByTaskId(int task_id){
+    public List<String> getPicsByTaskId(int task_id) {
         String basePath = Paths.get(".").toAbsolutePath().normalize().toString();
         String picPath = basePath + fs.getSeparator() + "data" + fs.getSeparator() + "tasks"
-            + fs.getSeparator() + task_id + fs.getSeparator() + "pictures";
+                + fs.getSeparator() + task_id + fs.getSeparator() + "pictures";
 
         File folder = new File(picPath);
         File[] files = folder.listFiles();
@@ -114,16 +114,16 @@ public class TaskServiceImpl implements TaskService {
 
 
         if (files != null) {
-            for (File file: files) {
+            for (File file : files) {
                 if (file.isFile()) {
                     fileURIs.add("http://" + "206.189.35.98" + ":" + port + "/api/tasks/" + task_id
-                        + "/pictures/" + file.getName()
+                            + "/pictures/" + file.getName()
                     );
                 }
 
             }
         }
-        return  fileURIs;
+        return fileURIs;
     }
 
 }

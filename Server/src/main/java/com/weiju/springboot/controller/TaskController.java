@@ -43,7 +43,7 @@ public class TaskController {
 
     @Autowired
     public TaskController(TaskRepository taskRepository, TaskService taskService,
-        Environment environment, CommitService commitService) {
+                          Environment environment, CommitService commitService) {
         this.taskRepository = taskRepository;
         this.taskService = taskService;
         this.environment = environment;
@@ -52,19 +52,21 @@ public class TaskController {
 
 
     @PostMapping("/")
-    public HttpStatus createTask(@RequestBody Map<String, Map<String, Object>> payload) {
+    public ResponseEntity createTask(@RequestBody Map<String, Map<String, Object>> payload) {
+        logger.info("try to create a task");
         JSONObject data = new JSONObject(payload.get("data"));
-        int uuid = Integer.parseInt(data.getString("uuid"));
+        int user_id = data.getInt("user_id");
         String formatter = data.getJSONObject("formatter").toString();
-        String title  = data.getString("title");
+        String title = data.getString("title");
         String start_time = data.getString("start_time");
         String deadline = data.getString("deadline");
         String description = data.getString("description");
         int type = data.getInt("type");
 
-        taskService.createTask(uuid, formatter, title, start_time, deadline, description, type);
+        logger.info("finish extract task information");
+        taskService.createTask(user_id, formatter, title, start_time, deadline, description, type);
 
-        return HttpStatus.CREATED;
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 
 
@@ -87,18 +89,18 @@ public class TaskController {
 
         if (((PageRequest) pageable).previous() != null) {
             response.put("previous", "http://206.189.35.98:12000/api/tasks/?offset="
-                + ((PageRequest) pageable).previous().getPageNumber() +
-                "&limit=" + ((PageRequest) pageable).previous().getOffset());
+                    + ((PageRequest) pageable).previous().getPageNumber() +
+                    "&limit=" + ((PageRequest) pageable).previous().getOffset());
         }
         if (pageable.next() != null) {
             response.put("next", "http://206.189.35.98:12000/api/tasks/?offset="
-                + pageable.next().getPageNumber() +
-                "&limit=" + pageable.next().getOffset());
+                    + pageable.next().getPageNumber() +
+                    "&limit=" + pageable.next().getOffset());
         }
 
         Page<Task> tasks = taskRepository.findAll(pageable);
         List<JSONObject> tasksInfo = new LinkedList<>();
-        for (Task task: tasks) {
+        for (Task task : tasks) {
             JSONObject taskJSON = new JSONObject();
             taskJSON.put("name", task.getName());
             taskJSON.put("id", task.getTaskid());
@@ -123,7 +125,6 @@ public class TaskController {
     }
 
 
-
     @GetMapping("/{task_id}")
     public ResponseEntity<String> getTaskById(@PathVariable(value = "task_id", required = true) String task_id) {
         JSONObject payload = new JSONObject();
@@ -132,7 +133,7 @@ public class TaskController {
         if (task != null) {
             String basePath = Paths.get(".").toAbsolutePath().normalize().toString();
             String picPath = basePath + fs.getSeparator() + "data" + fs.getSeparator() + "tasks"
-                + fs.getSeparator() + task_id + fs.getSeparator() + "pictures";
+                    + fs.getSeparator() + task_id + fs.getSeparator() + "pictures";
             //logger.info(picPath);
             File folder = new File(picPath);
             File[] files = folder.listFiles();
@@ -142,7 +143,7 @@ public class TaskController {
                 for (File file : files) {
                     if (file.isFile()) {
                         fileURIs.add(
-                            "http://" + "206.189.35.98" + ":" + port + "/api/file/tasks/" + task_id + "/pictures/" + file.getName());
+                                "http://" + "206.189.35.98" + ":" + port + "/api/file/tasks/" + task_id + "/pictures/" + file.getName());
                     }
                     logger.info(file.getName());
                 }
@@ -174,7 +175,7 @@ public class TaskController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<String> updateTask(@PathVariable(value = "id") String id,
-        @RequestBody Map<String, Map<String, Object>> payload) {
+                                             @RequestBody Map<String, Map<String, Object>> payload) {
         JSONObject data = new JSONObject();
         int idI = Integer.parseInt((String) payload.get("data").get("id"));
         if (Integer.parseInt(id) != idI) {
@@ -197,7 +198,7 @@ public class TaskController {
             taskJSON.put("formatter", task.getFormatter());
             data.put("data", taskJSON);
         } else {
-            return new ResponseEntity<>("{\"error\": \"Data not Found\"}",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("{\"error\": \"Data not Found\"}", HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(data.toString(), HttpStatus.OK);
@@ -205,7 +206,7 @@ public class TaskController {
 
     @PostMapping("/apply")
     public ResponseEntity<String> applyTask(@RequestBody Map<String, Map<String, Object>> payload) {
-        Map <String, Object> data = payload.get("data");
+        Map<String, Object> data = payload.get("data");
         int task_id = (Integer) data.get("task_id");
         int user_id = (Integer) data.get("user_id");
 
@@ -239,7 +240,6 @@ public class TaskController {
         }
 
     }
-
 
 
 }
