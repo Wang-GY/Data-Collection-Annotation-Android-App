@@ -17,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /*
 from https://juejin.im/post/58c29e0b1b69e6006bce02f4
@@ -26,9 +27,18 @@ from https://juejin.im/post/58c29e0b1b69e6006bce02f4
 //@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     // bean bug
+    private final UserDetailsService userDetailsService;
+    private final JwtTokenUtil jwtTokenUtil;
+
     @Autowired
-    @Qualifier("JwtUserDetailServiceImpl")
-    private UserDetailsService userDetailsService;
+    public WebSecurityConfig(@Qualifier("JwtUserDetailServiceImpl") UserDetailsService userDetailsService,
+                             JwtTokenUtil jwtTokenUtil
+    ) {
+        this.userDetailsService = userDetailsService;
+        this.jwtTokenUtil = jwtTokenUtil;
+    }
+
+
 
     /*
     @Autowired
@@ -84,6 +94,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // 禁用缓存
         httpSecurity.headers().cacheControl();
+
+        JwtAuthorizationTokenFilter authorizationTokenFilter = new JwtAuthorizationTokenFilter(userDetailsService, jwtTokenUtil,
+                "Authorization"
+        );
+        httpSecurity.
+                addFilterBefore(authorizationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // disable page caching
+        httpSecurity
+                .headers()
+                .frameOptions().sameOrigin()  // required to set for H2 else H2 Console will be blank.
+                .cacheControl();
     }
 
     @Bean

@@ -16,9 +16,10 @@ spring:
           enabled: true
           cache: true
 jwt:
-  header: Authorization
+  header: "Authorization"
   secret: mySecret
   expiration: 604800
+  tokenHead: "Bearer "
   route:
     authentication:
       path: /auth
