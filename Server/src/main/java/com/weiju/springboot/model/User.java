@@ -59,6 +59,14 @@ public class User {
     private List<Commit> commits;
 
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
+    private List<Credential> credentials;
+
+    public List<Credential> getCredentials() {
+        return credentials;
+    }
+
     public List<Commit> getCommits() {
         return commits;
     }

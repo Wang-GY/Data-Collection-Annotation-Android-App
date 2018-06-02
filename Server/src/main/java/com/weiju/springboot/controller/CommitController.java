@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("api/commits")
+
 public class CommitController {
     private static Logger logger = LoggerFactory.getLogger(CommitController.class);
     final CommitRepository commitRepository;
@@ -65,6 +67,7 @@ public class CommitController {
      * @return
      */
     @PostMapping("/")
+    @PreAuthorize("hasAnyRole('USER_ANNOTATION_COLLECTION')")
     public ResponseEntity<String> uploadCommit(@RequestBody Map<String, Map<String, Object>> payload) throws BaseException {
 
         try {
@@ -101,6 +104,7 @@ public class CommitController {
      * @throws BaseException
      */
     @PostMapping("/pictures/{commitid}/")
+    @PreAuthorize("hasRole('USER_ANNOTATION_COLLECTION')")
     public ResponseEntity<String> uploadCollectionData(@PathVariable(value = "commitid") int commitid, @RequestParam("file") List<MultipartFile> multipartFiles) throws BaseException {
         logger.info("commit picture with id : " + String.valueOf(commitid));
         // get commit
@@ -231,6 +235,7 @@ public class CommitController {
      * @return
      */
     @GetMapping()
+    @PreAuthorize("hasAnyRole('USER_ANNOTATION_COLLECTION','ADMIN')")
     public ResponseEntity<String> getUserCommits(@RequestParam(name = "user", required = false, defaultValue = "") String userid,
                                                  @RequestParam(name = "task", required = false, defaultValue = "") String task_id,
                                                  @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,

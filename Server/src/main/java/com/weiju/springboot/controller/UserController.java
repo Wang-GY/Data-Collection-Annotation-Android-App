@@ -30,30 +30,6 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    // 用户注册
-    @PostMapping(value = "/")
-    public ResponseEntity<String> userRegistration(@RequestBody Map<String, Map<String, Object>> payload) {
-        logger.info("new user try to register");
-        JSONObject data = new JSONObject(payload.get("data"));
-        logger.info("get data:\n" + data.toString());
-        //check email-exist:
-        if (!userRepository.existsByEmail(data.getString("email"))) {
-            logger.warn("email already exist!");
-            // throw new BaseException("email already registered", HttpStatus.NOT_FOUND);
-        }
-
-        User user = userService.registerUser(data.getString("email"), data.getString("password"));
-        logger.info("new user created: " + user.getEmail());
-        JSONObject user_info = new JSONObject();
-        user_info.put("email", user.getEmail());
-        user_info.put("id", user.getUserid());
-        user_info.put("password", user.getHashed_password());
-
-        JSONObject return_info = new JSONObject();
-        return_info.put("data", user_info);
-
-        return new ResponseEntity<>(return_info.toString(), HttpStatus.CREATED);
-    }
 
     //获取用户信息
     @GetMapping(value = "/{id}/")
@@ -68,6 +44,7 @@ public class UserController {
 
     }
 
+    //TODO check id
     //更新用户信息
     @PatchMapping(value = "/{id}/")
     public ResponseEntity<Object> updateUserProfile(@PathVariable("id") int userid, @RequestBody Map<String, Object> payload) throws Exception {

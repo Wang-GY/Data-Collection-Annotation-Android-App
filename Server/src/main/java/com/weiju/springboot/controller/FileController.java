@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,6 +73,7 @@ public class FileController {
      * @throws BaseException
      */
     @PostMapping(value = "/")
+    @PreAuthorize("hasAnyRole('ADMIN','USER_ANNOTATION_COLLECTION','USER_PUBLISHER')")
     public ResponseEntity<String> uploadTempFile(@RequestParam("file") List<MultipartFile> multipartFiles) throws BaseException {
         logger.info("request uploadFile");
 
