@@ -195,7 +195,7 @@ public class TaskController {
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
             //TODO formater to formatter
-            taskJSON.put("formatter", task.getFormatter());
+            taskJSON.put("formatter", new JSONObject(task.getFormatter()));
             data.put("data", taskJSON);
         } else {
             return new ResponseEntity<>("{\"error\": \"Data not Found\"}", HttpStatus.NOT_FOUND);
