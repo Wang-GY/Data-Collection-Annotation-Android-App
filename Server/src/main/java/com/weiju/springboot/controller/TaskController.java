@@ -1,5 +1,7 @@
 package com.weiju.springboot.controller;
 
+import com.weiju.springboot.exception.BaseException;
+import com.weiju.springboot.model.Commit;
 import com.weiju.springboot.model.Task;
 import com.weiju.springboot.model.User;
 import com.weiju.springboot.repository.TaskRepository;
@@ -72,33 +74,33 @@ public class TaskController {
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
-    // TODO fix this
+
     @GetMapping("/")
     public ResponseEntity<String> getTasks(@RequestParam Map<String, String> requestParams) {
-        int offset = 0;
-        int limit = 10;
-        if (requestParams.get("offset") != null) {
-            offset = Integer.parseInt(requestParams.get("offset"));
+        int pageNum = 0;
+        int pageSize = 10;
+        if (requestParams.get("pageNum") != null) {
+            pageNum = Integer.parseInt(requestParams.get("pageNum"));
         }
-        if (requestParams.get("limit") != null) {
-            limit = Integer.parseInt(requestParams.get("limit"));
+        if (requestParams.get("pageSize") != null) {
+            pageSize = Integer.parseInt(requestParams.get("pageSize"));
         }
         JSONObject response = new JSONObject();
         JSONObject taskData = new JSONObject();
 
-        Pageable pageable = PageRequest.of(offset, limit);
-
-
-        if (((PageRequest) pageable).previous() != null) {
-            response.put("previous", "http://206.189.35.98:12000/api/tasks/?offset="
-                    + ((PageRequest) pageable).previous().getPageNumber() +
-                    "&limit=" + ((PageRequest) pageable).previous().getOffset());
-        }
-        if (pageable.next() != null) {
-            response.put("next", "http://206.189.35.98:12000/api/tasks/?offset="
-                    + pageable.next().getPageNumber() +
-                    "&limit=" + pageable.next().getOffset());
-        }
+        //Pageable pageable = PageRequest.of(pageNum, pageSize);
+        Pageable pageable = new PageRequest(pageNum,pageSize);
+//
+//        if (((PageRequest) pageable).previous() != null) {
+//            response.put("previous", "http://206.189.35.98:12000/api/tasks/?offset="
+//                    + ((PageRequest) pageable).previous().getPageNumber() +
+//                    "&limit=" + ((PageRequest) pageable).previous().getOffset());
+//        }
+//        if (pageable.next() != null) {
+//            response.put("next", "http://206.189.35.98:12000/api/tasks/?offset="
+//                    + pageable.next().getPageNumber() +
+//                    "&limit=" + pageable.next().getOffset());
+//        }
 
         Page<Task> tasks = taskRepository.findAll(pageable);
         List<JSONObject> tasksInfo = new LinkedList<>();
@@ -114,7 +116,7 @@ public class TaskController {
             taskJSON.put("description", task.getDescription());
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
-            taskJSON.put("formater", task.getFormatter());
+            taskJSON.put("formatter", task.getFormatter());
             tasksInfo.add(taskJSON);
         }
 
@@ -127,7 +129,7 @@ public class TaskController {
 
 
     @GetMapping("/{task_id}")
-    public ResponseEntity<String> getTaskById(@PathVariable(value = "task_id", required = true) String task_id) {
+    public ResponseEntity<String> getTaskById(@PathVariable(value = "task_id", required = true) String task_id) throws BaseException {
         JSONObject payload = new JSONObject();
         JSONObject taskJSON = new JSONObject();
         Task task = taskService.getTaskProfile(Integer.parseInt(task_id));
@@ -164,11 +166,8 @@ public class TaskController {
             payload.put("data", taskJSON);
             return new ResponseEntity<>(payload.toString(), HttpStatus.OK);
         }
-        taskJSON.put("title", "No such task.");
-        taskJSON.put("detail", "No such task.");
 
-        payload.put("error", taskJSON);
-        return new ResponseEntity<>(payload.toString(), HttpStatus.NOT_FOUND);
+        throw new BaseException("No such task","No such task",HttpStatus.NOT_FOUND);
 
     }
 
@@ -195,7 +194,7 @@ public class TaskController {
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
             //TODO formater to formatter
-            taskJSON.put("formatter", task.getFormatter());
+            taskJSON.put("formatter", new JSONObject(task.getFormatter()));
             data.put("data", taskJSON);
         } else {
             return new ResponseEntity<>("{\"error\": \"Data not Found\"}", HttpStatus.NOT_FOUND);
@@ -216,18 +215,22 @@ public class TaskController {
 
         JSONObject returnData = new JSONObject();
 
-
+        // TODO fix commit size
+        Commit commit = commitService.save(task_id, user_id, task.getSize());
         if (task != null && user != null) {
             if (task.getType() == 0) {
-                commitService.save(task_id, user_id, task.getSize());
+
                 List<String> picsURI = taskService.getPicsByTaskId(task_id);
-                returnData.put("commit_id", user_id);
+                returnData.put("commit_id", commit.getCommitid());
+
                 returnData.put("size", task.getSize());
                 returnData.put("task_id", task.getTaskid());
                 returnData.put("type", task.getType());
                 returnData.put("pictures", picsURI);
 
             } else if (task.getType() == 1) {
+
+                returnData.put("commit_id", commit.getCommitid());
                 returnData.put("size", task.getSize());
                 returnData.put("task_id", task.getTaskid());
                 returnData.put("type", task.getType());

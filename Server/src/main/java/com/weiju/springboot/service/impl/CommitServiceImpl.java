@@ -102,13 +102,13 @@ public class CommitServiceImpl implements CommitService {
      * find commits with limit and offset
      *
      * @param committer
-     * @param limit
-     * @param offset
+     * @param pageNum
+     * @param pageSize
      * @return
      */
     @Override
-    public Page<Commit> findByCommitter(User committer, Integer limit, Integer offset) {
-        Pageable pageable = new PageRequest(limit, offset);
+    public Page<Commit> findByCommitter(User committer, Integer pageNum, Integer pageSize) {
+        Pageable pageable = new PageRequest(pageNum, pageSize);
         return commitPaginationAndSortingRepository.findByCommitter(committer, pageable);
     }
 
@@ -117,14 +117,14 @@ public class CommitServiceImpl implements CommitService {
      *
      * @param committer
      * @param task
-     * @param limit
-     * @param offset
+     * @param pageNum
+     * @param pageSize
      * @return
      */
     @Override
-    public Page<Commit> findByCommitterAndAndTask(User committer, Task task, Integer limit, Integer offset) {
+    public Page<Commit> findByCommitterAndAndTask(User committer, Task task, Integer pageNum, Integer pageSize) {
 
-        Pageable pageable = new PageRequest(limit, offset);
+        Pageable pageable = new PageRequest(pageNum, pageSize);
         return commitPaginationAndSortingRepository.findByCommitterAndAndTask(committer, task, pageable);
 
     }
@@ -133,13 +133,13 @@ public class CommitServiceImpl implements CommitService {
      * find commits with limit and offset
      *
      * @param task
-     * @param limit
-     * @param offset
+     * @param pageNum
+     * @param pageSize
      * @return
      */
     @Override
-    public Page<Commit> findByTask(Task task, Integer limit, Integer offset) {
-        Pageable pageRequest = new PageRequest(limit, offset);
+    public Page<Commit> findByTask(Task task, Integer pageNum, Integer pageSize) {
+        Pageable pageRequest = new PageRequest(pageNum, pageSize);
         return commitPaginationAndSortingRepository.findByTask(task, pageRequest);
     }
 

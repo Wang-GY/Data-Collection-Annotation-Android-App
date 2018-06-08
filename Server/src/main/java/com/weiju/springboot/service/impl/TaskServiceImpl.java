@@ -73,7 +73,7 @@ public class TaskServiceImpl implements TaskService {
                 if (entry.getKey().equals("id")) {
                     continue;
                 }
-
+                //TODO update deadline and formatter
                 switch ((String) entry.getKey()) {
                     case "name":
                         task.setName(entry.getValue().toString());
@@ -83,6 +83,12 @@ public class TaskServiceImpl implements TaskService {
                         break;
                     case "size":
                         task.setSize((Integer) entry.getValue());
+                        break;
+                    case "formatter":
+                        task.setFormatter((String) entry.getValue());
+                        break;
+                    case "deadline":
+                        task.setDeadline((String) entry.getValue());
                         break;
                 }
             }
