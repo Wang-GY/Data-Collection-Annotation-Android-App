@@ -1,12 +1,14 @@
 package com.weiju.springboot.service.impl;
 
 import com.weiju.springboot.controller.AuthController;
+import com.weiju.springboot.exception.BaseException;
 import com.weiju.springboot.model.Credential;
 import com.weiju.springboot.model.Role;
 import com.weiju.springboot.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -102,18 +104,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean verifyLogin(String email, String password) {
+    public Boolean verifyLogin(String email, String password) throws BaseException {
+       if(!userRepository.existsByEmail(email)){
+           throw new BaseException("wrong password or email","email not registered", HttpStatus.NOT_FOUND);
+       }
         User user = userRepository.findByEmail(email);
         //TODO generate error
         logger.info("raw password: " + password);
         logger.info("database password: " + user.getHashed_password());
         logger.info("hashed password: " + hashPassword(password));
-        if (user == null) {
-            return false;
-        } else if (new BCryptPasswordEncoder().matches(password, user.getHashed_password())) {
+        if (new BCryptPasswordEncoder().matches(password, user.getHashed_password())) {
             return true;
+        }else {
+            throw new BaseException("wrong password or email","wrong password",HttpStatus.BAD_REQUEST);
         }
-        return false;
     }
 
     //TODO encrypt password

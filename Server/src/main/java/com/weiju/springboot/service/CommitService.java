@@ -10,9 +10,9 @@ import java.util.List;
 public interface CommitService {
     Commit save(int task_id, int committer_id, int size);
 
-    Page<Commit> findByCommitter(User committer, Integer limit, Integer offset);
+    Page<Commit> findByCommitter(User committer, Integer pageNum, Integer pageSize);
 
-    Page<Commit> findByCommitterAndAndTask(User committer, Task task, Integer limit, Integer offset);
+    Page<Commit> findByCommitterAndAndTask(User committer, Task task, Integer pageNum, Integer pageSize);
 
-    Page<Commit> findByTask(Task task, Integer limit, Integer offset);
+    Page<Commit> findByTask(Task task, Integer pageNum, Integer pageSize);
 }

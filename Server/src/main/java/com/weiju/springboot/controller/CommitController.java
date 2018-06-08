@@ -231,15 +231,16 @@ public class CommitController {
      *
      * @param userid
      * @param task_id
-     * @param limit
+     * @param pageNum
      * @return
      */
+    //TODO fix bug here
     @GetMapping()
     @PreAuthorize("hasAnyRole('USER_ANNOTATION_COLLECTION','ADMIN')")
     public ResponseEntity<String> getUserCommits(@RequestParam(name = "user", required = false, defaultValue = "") String userid,
                                                  @RequestParam(name = "task", required = false, defaultValue = "") String task_id,
-                                                 @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
-                                                 @RequestParam(name = "offset", required = false, defaultValue = "1") int offset
+                                                 @RequestParam(name = "pageNum", required = false, defaultValue = "0") int pageNum,
+                                                 @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize
     ) throws BaseException {
 
 
@@ -254,15 +255,16 @@ public class CommitController {
             if (user != null && task != null) {
                 //commits = commitRepository.findByCommitterAndAndTask(user, task);
                 logger.info("findByCommitterAndAndTask");
-                commits = commitService.findByCommitterAndAndTask(user, task, limit, offset);
+                commits = commitService.findByCommitterAndAndTask(user, task, pageNum, pageSize);
             } else if (user != null) {
                 //commits = commitRepository.findByCommitter(user);
                 logger.info("findByCommitter");
-                commits = commitService.findByCommitter(user, limit, offset);
+                logger.info(String.valueOf(user.getUserid()));
+                commits = commitService.findByCommitter(user, pageNum, pageSize);
             } else {
                 //commits = commitRepository.findByTask(task);
                 logger.info("findByTask");
-                commits = commitService.findByTask(task, limit, offset);
+                commits = commitService.findByTask(task, pageNum, pageSize);
 
             }
 
