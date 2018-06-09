@@ -120,14 +120,14 @@ public class AuthController {
 
     // 用户注册
     @PostMapping(value = "/register")
-    public ResponseEntity<String> userRegistration(@RequestBody Map<String, Map<String, Object>> payload) {
+    public ResponseEntity<String> userRegistration(@RequestBody Map<String, Map<String, Object>> payload) throws BaseException {
         logger.info("new user try to register");
         JSONObject data = new JSONObject(payload.get("data"));
         logger.info("get data:\n" + data.toString());
         //check email-exist:
-        if (!userRepository.existsByEmail(data.getString("email"))) {
+        if (userRepository.existsByEmail(data.getString("email"))) {
             logger.warn("email already exist!");
-            // throw new BaseException("email already registered", HttpStatus.NOT_FOUND);
+            throw new BaseException("This email has already been registered","can not insert into users,violate email unique constrain",HttpStatus.BAD_REQUEST);
         }
 
         User user = userService.registerUser(data.getString("email"), data.getString("password"));
