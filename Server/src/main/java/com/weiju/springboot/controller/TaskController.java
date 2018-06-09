@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -124,7 +125,8 @@ public class TaskController {
         taskData.put("tasks", tasksInfo);
         response.put("data", taskData);
 
-        return new ResponseEntity<>(response.toString(), HttpStatus.OK);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response.toString());
+        //return new ResponseEntity<>(response.toString(), HttpStatus.OK);
     }
 
 
@@ -164,7 +166,8 @@ public class TaskController {
             taskJSON.put("formatter", new JSONObject(task.getFormatter()));
 
             payload.put("data", taskJSON);
-            return new ResponseEntity<>(payload.toString(), HttpStatus.OK);
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(payload.toString());
+            //return new ResponseEntity<>(payload.toString(), HttpStatus.OK);
         }
 
         throw new BaseException("No such task","No such task",HttpStatus.NOT_FOUND);
@@ -200,7 +203,8 @@ public class TaskController {
             return new ResponseEntity<>("{\"error\": \"Data not Found\"}", HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(data.toString(), HttpStatus.OK);
+        //return new ResponseEntity<>(data.toString(), HttpStatus.OK);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(data.toString());
     }
 
     @PostMapping("/apply")
@@ -238,7 +242,8 @@ public class TaskController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            return new ResponseEntity<>(returnData.toString(), HttpStatus.OK);
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(returnData.toString());
+           // return new ResponseEntity<>(returnData.toString(), HttpStatus.OK);
 
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

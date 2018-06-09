@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -122,7 +123,8 @@ public class CommitController {
         }
         JSONObject response = new JSONObject();
         response.put("data", url_list);
-        return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
+        return ResponseEntity.created(null).contentType(MediaType.APPLICATION_JSON).body(response.toString());
+        //return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
     }
 
     /**
@@ -156,7 +158,8 @@ public class CommitController {
             data.put("commit_id", commit.getCommitid());
             response.put("data", data);
 
-            return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
+            return ResponseEntity.created(null).contentType(MediaType.APPLICATION_JSON).body(response.toString());
+            //return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -234,7 +237,6 @@ public class CommitController {
      * @param pageNum
      * @return
      */
-    //TODO fix bug here
     @GetMapping()
     @PreAuthorize("hasAnyRole('USER_ANNOTATION_COLLECTION','ADMIN')")
     public ResponseEntity<String> getUserCommits(@RequestParam(name = "user", required = false, defaultValue = "") String userid,
@@ -292,7 +294,8 @@ public class CommitController {
                 logger.info("put commits into data");
                 response.put("data", responseData);
 
-                return new ResponseEntity<>(response.toString(), HttpStatus.OK);
+                return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response.toString());
+                //return new ResponseEntity<>(response.toString(), HttpStatus.OK);
 
             } else {
                 return null;

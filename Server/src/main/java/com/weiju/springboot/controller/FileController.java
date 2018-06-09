@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -81,7 +82,8 @@ public class FileController {
         JSONObject response = new JSONObject();
         response.put("data", file_urls);
         logger.info(response.toString());
-        return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
+        return ResponseEntity.created(null).contentType(MediaType.APPLICATION_JSON).body(response.toString());
+        //return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
     }
 
 

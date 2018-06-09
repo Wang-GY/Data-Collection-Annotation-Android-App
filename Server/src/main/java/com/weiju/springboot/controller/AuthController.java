@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -111,7 +112,8 @@ public class AuthController {
             logger.info(token);
             JSONObject response = new JSONObject();
             response.put("data", login_info);
-            return new ResponseEntity<>(response.toString(), HttpStatus.OK);
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response.toString());
+            //return new ResponseEntity<>(response.toString(), HttpStatus.OK);
         } else {
             logger.warn("user not found");
             throw new BaseException("wrong password or email", HttpStatus.NOT_FOUND);
@@ -127,7 +129,7 @@ public class AuthController {
         //check email-exist:
         if (userRepository.existsByEmail(data.getString("email"))) {
             logger.warn("email already exist!");
-            throw new BaseException("This email has already been registered","can not insert into users,violate email unique constrain",HttpStatus.BAD_REQUEST);
+            throw new BaseException("This email has already been registered", "can not insert into users,violate email unique constrain", HttpStatus.BAD_REQUEST);
         }
 
         User user = userService.registerUser(data.getString("email"), data.getString("password"));
@@ -144,7 +146,7 @@ public class AuthController {
 
         JSONObject return_info = new JSONObject();
         return_info.put("data", user_info);
-
-        return new ResponseEntity<>(return_info.toString(), HttpStatus.CREATED);
+        return ResponseEntity.created(null).contentType(MediaType.APPLICATION_JSON).body(return_info.toString());
+        // return new ResponseEntity<>(return_info.toString(), HttpStatus.CREATED);
     }
 }
