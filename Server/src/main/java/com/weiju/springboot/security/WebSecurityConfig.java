@@ -88,7 +88,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.js"
                 ).permitAll()
                 // 对于获取token的rest api要认证
-                .antMatchers("/api/**").authenticated()
+                //.antMatchers("/api/**").authenticated()
                 // 其他均允许
                 .anyRequest().permitAll();
 

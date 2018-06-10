@@ -27,6 +27,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Paths;
 import java.io.*;
 
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,10 @@ public class TaskController {
         this.userService = userService;
     }
 
-
+    /**
+     * @param payload
+     * @return
+     */
     @PostMapping("/")
     public ResponseEntity createTask(@RequestBody Map<String, Map<String, Object>> payload) {
         logger.info("try to create a task");
@@ -90,7 +94,7 @@ public class TaskController {
         JSONObject taskData = new JSONObject();
 
         //Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Pageable pageable = new PageRequest(pageNum,pageSize);
+        Pageable pageable = new PageRequest(pageNum, pageSize);
 //
 //        if (((PageRequest) pageable).previous() != null) {
 //            response.put("previous", "http://206.189.35.98:12000/api/tasks/?offset="
@@ -171,7 +175,7 @@ public class TaskController {
             //return new ResponseEntity<>(payload.toString(), HttpStatus.OK);
         }
 
-        throw new BaseException("No such task","No such task",HttpStatus.NOT_FOUND);
+        throw new BaseException("No such task", "No such task", HttpStatus.NOT_FOUND);
 
     }
 
@@ -244,7 +248,7 @@ public class TaskController {
             }
 
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(returnData.toString());
-           // return new ResponseEntity<>(returnData.toString(), HttpStatus.OK);
+            // return new ResponseEntity<>(returnData.toString(), HttpStatus.OK);
 
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

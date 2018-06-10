@@ -1,5 +1,6 @@
 package com.weiju.springboot.controller;
 
+import com.weiju.springboot.exception.BaseException;
 import com.weiju.springboot.model.User;
 import com.weiju.springboot.repository.UserRepository;
 import org.json.JSONObject;
@@ -33,10 +34,12 @@ public class UserController {
 
     //获取用户信息
     @GetMapping(value = "/{id}/")
-    public ResponseEntity<Object> getUserProfile(@PathVariable("id") int userid) {
+    public ResponseEntity<Object> getUserProfile(@PathVariable("id") int userid) throws BaseException {
         logger.info("get user info : " + String.valueOf(userid));
         User user = userService.getUserProfile(userid);
-
+        if (user==null){
+            throw  new BaseException("can not find this user","wrong user_id",HttpStatus.NOT_FOUND);
+        }
         Map<String,Object> res = new LinkedHashMap<>();
         res.put("data", user);
         logger.info("construct response");
