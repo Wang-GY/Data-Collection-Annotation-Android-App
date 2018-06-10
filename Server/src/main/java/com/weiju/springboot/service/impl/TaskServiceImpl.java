@@ -92,7 +92,9 @@ public class TaskServiceImpl implements TaskService {
                     case "formatter":
                         logger.info("change formatter:");
                         logger.info(new JSONObject(entry.getValue()).toString());
-                        task.setFormatter((String) entry.getValue());
+                        Map<String,Object> map =(Map<String,Object>) entry.getValue();
+                        JSONObject jsonObject = new JSONObject(map);
+                        task.setFormatter(jsonObject.toString());
                         break;
                     case "deadline":
                         task.setDeadline((String) entry.getValue());
