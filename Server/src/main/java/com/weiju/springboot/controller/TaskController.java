@@ -143,11 +143,12 @@ public class TaskController {
             File[] files = folder.listFiles();
             List<String> fileURIs = new LinkedList<>();
             String port = environment.getProperty("local.server.port");
+            String ip = environment.getProperty("myip");
             if (files != null) {
                 for (File file : files) {
                     if (file.isFile()) {
                         fileURIs.add(
-                                "http://" + "206.189.35.98" + ":" + port + "/api/file/tasks/" + task_id + "/pictures/" + file.getName());
+                                "http://" + ip + ":" + port + "/api/file/tasks/" + task_id + "/pictures/" + file.getName());
                     }
                     logger.info(file.getName());
                 }

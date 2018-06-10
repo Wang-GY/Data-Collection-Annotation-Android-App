@@ -58,6 +58,7 @@ public class FileServiceImpl implements FileService {
     public List<String> uploadFiles(List<MultipartFile> multipartFiles, String relativePath) {
         List<String> url_list = new LinkedList<>();
         String port = environment.getProperty("local.server.port");
+        String ip = environment.getProperty("myip");
         logger.info("BASE PATH: " + BASE_PATH.toString());
         try {
             Iterator iterator = multipartFiles.iterator();
@@ -65,7 +66,7 @@ public class FileServiceImpl implements FileService {
                 MultipartFile file = (MultipartFile) iterator.next();
                 String newFilename = store(file, Paths.get(BASE_PATH, relativePath));
                 // TODO get real server ip
-                url_list.add("http://" + "206.189.35.98" + ":" + port + "/api/file" + relativePath + "/" + newFilename);
+                url_list.add("http://" + ip + ":" + port + "/api/file" + relativePath + "/" + newFilename);
                 logger.info("stored into " + Paths.get(BASE_PATH, relativePath).toString());
             }
             return url_list;
@@ -204,7 +205,8 @@ public class FileServiceImpl implements FileService {
 
     private String getUrlheader() {
         String port = environment.getProperty("local.server.port");
-        return "http://" + "206.189.35.98" + ":" + port + "/api/file";
+        String ip = environment.getProperty("myip");
+        return "http://" + ip + ":" + port + "/api/file";
     }
 
     /**

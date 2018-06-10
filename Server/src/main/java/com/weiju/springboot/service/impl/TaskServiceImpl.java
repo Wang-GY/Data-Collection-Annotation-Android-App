@@ -117,12 +117,12 @@ public class TaskServiceImpl implements TaskService {
         List<String> fileURIs = new LinkedList<>();
 
         String port = environment.getProperty("local.server.port");
-
+        String ip = environment.getProperty("myip");
 
         if (files != null) {
             for (File file : files) {
                 if (file.isFile()) {
-                    fileURIs.add("http://" + "206.189.35.98" + ":" + port + "/api/tasks/" + task_id
+                    fileURIs.add("http://" + ip + ":" + port + "/api/tasks/" + task_id
                             + "/pictures/" + file.getName()
                     );
                 }

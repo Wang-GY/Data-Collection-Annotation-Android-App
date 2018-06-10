@@ -24,3 +24,6 @@ jwt:
     authentication:
       path: /auth
       refresh: /refersh
+
+
+myip: 206.189.35.98
