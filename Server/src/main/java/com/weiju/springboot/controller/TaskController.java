@@ -121,7 +121,8 @@ public class TaskController {
             taskJSON.put("description", task.getDescription());
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
-            taskJSON.put("formatter", task.getFormatter());
+            taskJSON.put("formatter", new JSONObject(task.getFormatter()));
+            taskJSON.put("cover", taskService.getCoverByTaskId(task.getTaskid()));
             tasksInfo.add(taskJSON);
         }
 
@@ -168,6 +169,9 @@ public class TaskController {
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
             taskJSON.put("pictures", fileURIs);
+            if (!fileURIs.isEmpty()) {
+                taskJSON.put("cover", fileURIs.get(0));
+            }
             taskJSON.put("formatter", new JSONObject(task.getFormatter()));
 
             payload.put("data", taskJSON);
@@ -188,6 +192,7 @@ public class TaskController {
         if (Integer.parseInt(id) != idI) {
             return new ResponseEntity<>("{\"error\", \"Bad Request\"}", HttpStatus.BAD_REQUEST);
         }
+        logger.info("patch mapping");
         Task task = taskService.updateTaskProfile(payload.get("data"));
         if (task != null) {
             JSONObject taskJSON = new JSONObject();

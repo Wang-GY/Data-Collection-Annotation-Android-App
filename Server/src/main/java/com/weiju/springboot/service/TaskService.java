@@ -18,4 +18,7 @@ public interface TaskService {
     public Page<Task> getTasks(int offset, int limit);
 
     public List<String> getPicsByTaskId(int task_id);
+
+    //TODO add task cover in database!
+    String getCoverByTaskId(int task_id);
 }

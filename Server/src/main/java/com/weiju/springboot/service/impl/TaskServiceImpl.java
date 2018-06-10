@@ -3,7 +3,11 @@ package com.weiju.springboot.service.impl;
 import com.weiju.springboot.model.Task;
 import com.weiju.springboot.repository.TaskRepository;
 import com.weiju.springboot.repository.UserRepository;
+import com.weiju.springboot.service.FileService;
 import com.weiju.springboot.service.TaskService;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
@@ -29,6 +33,7 @@ public class TaskServiceImpl implements TaskService {
 
     private final UserRepository userRepository;
 
+    private static Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
     private static FileSystem fs = FileSystems.getDefault();
 
     @Autowired
@@ -85,6 +90,8 @@ public class TaskServiceImpl implements TaskService {
                         task.setSize((Integer) entry.getValue());
                         break;
                     case "formatter":
+                        logger.info("change formatter:");
+                        logger.info(new JSONObject(entry.getValue()).toString());
                         task.setFormatter((String) entry.getValue());
                         break;
                     case "deadline":
@@ -130,6 +137,20 @@ public class TaskServiceImpl implements TaskService {
             }
         }
         return fileURIs;
+    }
+
+    /**
+     * get task cover by task id
+     * @param task_id
+     * @return
+     */
+    //TODO add task cover in database!
+    @Override
+    public String getCoverByTaskId(int task_id){
+        List<String> list = getPicsByTaskId(task_id);
+        if(!list.isEmpty()){
+            return list.get(0);
+        }else return null;
     }
 
 }
