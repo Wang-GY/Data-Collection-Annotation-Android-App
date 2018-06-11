@@ -121,7 +121,7 @@ public class TaskController {
             taskJSON.put("type", task.getType());
             taskJSON.put("size", task.getSize());
             taskJSON.put("data_path", task.getData_path());
-            taskJSON.put("creator", task.getCreator().getUserid());
+            taskJSON.put("user_id", task.getCreator().getUserid());
             taskJSON.put("description", task.getDescription());
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
@@ -216,7 +216,7 @@ public class TaskController {
             taskJSON.put("size", task.getSize());
             taskJSON.put("description", task.getDescription());
             taskJSON.put("data_path", task.getData_path());
-            taskJSON.put("creator", task.getCreator().getUserid());
+            taskJSON.put("user_id", task.getCreator().getUserid());
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
             //TODO formater to formatter
@@ -235,6 +235,7 @@ public class TaskController {
      * apply a task
      * return a commit id
      * record a commit in database
+     *
      * @param payload
      * @return
      * @throws BaseException
@@ -255,8 +256,8 @@ public class TaskController {
             throw new BaseException("Task not found", "can not find task by this id", HttpStatus.NOT_FOUND);
         }
         User user = userService.getUserProfile(user_id);
-        if(user==null){
-            throw new BaseException("User not found","can not find user by this id",HttpStatus.NOT_FOUND);
+        if (user == null) {
+            throw new BaseException("User not found", "can not find user by this id", HttpStatus.NOT_FOUND);
         }
 
         JSONObject returnData = new JSONObject();
