@@ -14,12 +14,12 @@ public interface TaskService {
 
     public Task getTaskProfile(int id);
 
-    public Task updateTaskProfile(Map<String,Object> task_info) throws BaseException;
+    public Task updateTaskProfile(Map<String, Object> task_info) throws BaseException;
 
     public Page<Task> getTasks(int offset, int limit);
 
     public List<String> getPicsByTaskId(int task_id);
 
-    //TODO add task cover in database!
-    String getCoverByTaskId(int task_id);
+
+    String getCoverByTaskId(int task_id) throws BaseException;
 }

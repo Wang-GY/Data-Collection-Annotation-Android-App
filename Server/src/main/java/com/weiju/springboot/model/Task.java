@@ -45,12 +45,23 @@ public class Task {
     @Column(name = "deadline")
     private String deadline;
 
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    @Column(name = "cover")
+    private String cover;
+
+    public String getCover() {
+        return cover;
+    }
+
     //mappedBy : model 层定义的变量，不是数据库的字段
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Commit.class)
     @JsonIgnore
     private List<Commit> commits;
 
-    public List<Commit> getCommits(){
+    public List<Commit> getCommits() {
         return commits;
     }
 

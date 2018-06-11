@@ -115,6 +115,9 @@ public class TaskServiceImpl implements TaskService {
                     case "type":
                         task.setType((int) entry.getValue());
                         break;
+                    case "cover":
+                        task.setCover((String) entry.getValue());
+                        break;
                     default:
                         throw new BaseException("update fail", String.format("can not update this field: %s, you are not allowed or key error", (String) entry.getKey()), HttpStatus.BAD_REQUEST);
 
@@ -166,13 +169,14 @@ public class TaskServiceImpl implements TaskService {
      * @param task_id
      * @return
      */
-    //TODO add task cover in database!
     @Override
-    public String getCoverByTaskId(int task_id) {
-        List<String> list = getPicsByTaskId(task_id);
-        if (!list.isEmpty()) {
-            return list.get(0);
-        } else return null;
+    public String getCoverByTaskId(int task_id) throws BaseException {
+        Task task = taskRepository.findByTaskid(task_id);
+        if (task == null) {
+            throw new BaseException("task not fount", String.format("can not find task by this id:%d", task_id), HttpStatus.NOT_FOUND);
+        }
+        return task.getCover();
+
     }
 
 }
