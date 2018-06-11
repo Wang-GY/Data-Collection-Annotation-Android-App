@@ -17,7 +17,7 @@ public interface UserService {
 
     List<Role> getRules(User user);
 
-    User updateUser(Map<String,Object> user);
+    User updateUser(Map<String,Object> user) throws BaseException;
 
     Boolean verifyLogin(String email, String hashed_password) throws BaseException;
 }

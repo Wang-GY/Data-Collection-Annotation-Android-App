@@ -1,5 +1,7 @@
 package com.weiju.springboot.service.impl;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+import com.weiju.springboot.exception.BaseException;
 import com.weiju.springboot.model.Task;
 import com.weiju.springboot.repository.TaskRepository;
 import com.weiju.springboot.repository.UserRepository;
@@ -13,6 +15,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +52,10 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task createTask(int user_id, String formater, String title, String start_time, String deadline,
-                           String description, int type) {
+                           String description, int type) throws BaseException {
+        if (!userRepository.existsById(user_id)) {
+            throw new BaseException("user not exist", "can not find user by user_id", HttpStatus.NOT_FOUND);
+        }
         Task task = new Task();
         task.setFormatter(formater);
         task.setName(title);
@@ -58,7 +64,13 @@ public class TaskServiceImpl implements TaskService {
         task.setDeadline(deadline);
         task.setDescription(description);
         task.setType(type);
-        taskRepository.save(task);
+        try {
+            taskRepository.save(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BaseException("create task fail ", "MySQLIntegrityConstraintViolationException", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
+
         return task;
     }
 
@@ -68,9 +80,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task updateTaskProfile(Map<String, Object> task_info) {
+    public Task updateTaskProfile(Map<String, Object> task_info) throws BaseException {
 
         int taskid = (Integer) task_info.get("id");
+
 
         Task task = taskRepository.findByTaskid(taskid);
         if (task != null) {
@@ -92,13 +105,19 @@ public class TaskServiceImpl implements TaskService {
                     case "formatter":
                         logger.info("change formatter:");
                         logger.info(new JSONObject(entry.getValue()).toString());
-                        Map<String,Object> map =(Map<String,Object>) entry.getValue();
+                        Map<String, Object> map = (Map<String, Object>) entry.getValue();
                         JSONObject jsonObject = new JSONObject(map);
                         task.setFormatter(jsonObject.toString());
                         break;
                     case "deadline":
                         task.setDeadline((String) entry.getValue());
                         break;
+                    case "type":
+                        task.setType((int) entry.getValue());
+                        break;
+                    default:
+                        throw new BaseException("update fail", String.format("can not update this field: %s, you are not allowed or key error", (String) entry.getKey()), HttpStatus.BAD_REQUEST);
+
                 }
             }
             taskRepository.save(task);
@@ -143,16 +162,17 @@ public class TaskServiceImpl implements TaskService {
 
     /**
      * get task cover by task id
+     *
      * @param task_id
      * @return
      */
     //TODO add task cover in database!
     @Override
-    public String getCoverByTaskId(int task_id){
+    public String getCoverByTaskId(int task_id) {
         List<String> list = getPicsByTaskId(task_id);
-        if(!list.isEmpty()){
+        if (!list.isEmpty()) {
             return list.get(0);
-        }else return null;
+        } else return null;
     }
 
 }

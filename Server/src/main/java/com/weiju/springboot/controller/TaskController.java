@@ -42,6 +42,7 @@ public class TaskController {
     private final UserService userService;
     private static Logger logger = LoggerFactory.getLogger(FileService.class);
     private static FileSystem fs = FileSystems.getDefault();
+    private static final int DEFAULT_COMMIT_SIZE = 10;
 
     @Autowired
     private final Environment environment;
@@ -62,16 +63,19 @@ public class TaskController {
      * @return
      */
     @PostMapping("/")
-    public ResponseEntity createTask(@RequestBody Map<String, Map<String, Object>> payload) {
+    public ResponseEntity createTask(@RequestBody Map<String, Map<String, Object>> payload) throws BaseException {
         logger.info("try to create a task");
-        JSONObject data = new JSONObject(payload.get("data"));
-        int user_id = data.getInt("user_id");
-        String formatter = data.getJSONObject("formatter").toString();
-        String title = data.getString("title");
-        String start_time = data.getString("start_time");
-        String deadline = data.getString("deadline");
-        String description = data.getString("description");
-        int type = data.getInt("type");
+        Map<String, Object> data = payload.get("data");
+        int user_id = (int) data.get("user_id");
+        Map<String, Object> map = (Map<String, Object>) data.get("formatter");
+        JSONObject jsonObject = new JSONObject(map);
+        String formatter = jsonObject.toString();
+        String title = (String) data.get("title");
+        String start_time = (String) data.get("start_time");
+        String deadline = (String) data.get("deadline");
+        String description = (String) data.get("description");
+        int type = (int) data.get("type");
+
 
         logger.info("finish extract task information");
         taskService.createTask(user_id, formatter, title, start_time, deadline, description, type);
@@ -121,6 +125,7 @@ public class TaskController {
             taskJSON.put("description", task.getDescription());
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
+            taskJSON.put("pictures", taskService.getPicsByTaskId(task.getTaskid()));
             taskJSON.put("formatter", new JSONObject(task.getFormatter()));
             taskJSON.put("cover", taskService.getCoverByTaskId(task.getTaskid()));
             tasksInfo.add(taskJSON);
@@ -179,18 +184,26 @@ public class TaskController {
             //return new ResponseEntity<>(payload.toString(), HttpStatus.OK);
         }
 
-        throw new BaseException("No such task", "No such task", HttpStatus.NOT_FOUND);
+        throw new BaseException("No such task", "can not find task by this id", HttpStatus.NOT_FOUND);
 
     }
 
 
     @PatchMapping("/{id}")
     public ResponseEntity<String> updateTask(@PathVariable(value = "id") String id,
-                                             @RequestBody Map<String, Map<String, Object>> payload) {
+                                             @RequestBody Map<String, Map<String, Object>> payload) throws BaseException {
         JSONObject data = new JSONObject();
+        if (payload.get("data") == null) {
+            throw new BaseException("json error", "can not find 'data'", HttpStatus.BAD_REQUEST);
+        }
+        if (payload.get("data").get("id") == null) {
+            throw new BaseException("json error", "can not find 'id'", HttpStatus.BAD_REQUEST);
+        }
         int idI = (Integer) payload.get("data").get("id");
+
         if (Integer.parseInt(id) != idI) {
-            return new ResponseEntity<>("{\"error\", \"Bad Request\"}", HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity<>("{\"error\", \"Bad Request\"}", HttpStatus.BAD_REQUEST);
+            throw new BaseException("json error", "id not match", HttpStatus.BAD_REQUEST);
         }
         logger.info("patch mapping");
         Task task = taskService.updateTaskProfile(payload.get("data"));
@@ -210,22 +223,41 @@ public class TaskController {
             taskJSON.put("formatter", new JSONObject(task.getFormatter()));
             data.put("data", taskJSON);
         } else {
-            return new ResponseEntity<>("{\"error\": \"Data not Found\"}", HttpStatus.NOT_FOUND);
+            //return new ResponseEntity<>("{\"error\": \"Data not Found\"}", HttpStatus.NOT_FOUND);
+            throw new BaseException("No such task", "can not find task by this id", HttpStatus.NOT_FOUND);
         }
 
         //return new ResponseEntity<>(data.toString(), HttpStatus.OK);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(data.toString());
     }
 
+    /**
+     * apply a task
+     * return a commit id
+     * record a commit in database
+     * @param payload
+     * @return
+     * @throws BaseException
+     */
     @PostMapping("/apply")
-    public ResponseEntity<String> applyTask(@RequestBody Map<String, Map<String, Object>> payload) {
+    public ResponseEntity<String> applyTask(@RequestBody Map<String, Map<String, Object>> payload) throws BaseException {
         logger.info("user try to apply a task");
         Map<String, Object> data = payload.get("data");
+
+        if (data.get("task_id") == null || data.get("user_id") == null) {
+            throw new BaseException("json error", "'task_id' or 'user_id' not found", HttpStatus.BAD_REQUEST);
+        }
         int task_id = (Integer) data.get("task_id");
         int user_id = (Integer) data.get("user_id");
 
         Task task = taskService.getTaskProfile(task_id);
+        if (task == null) {
+            throw new BaseException("Task not found", "can not find task by this id", HttpStatus.NOT_FOUND);
+        }
         User user = userService.getUserProfile(user_id);
+        if(user==null){
+            throw new BaseException("User not found","can not find user by this id",HttpStatus.NOT_FOUND);
+        }
 
         JSONObject returnData = new JSONObject();
 
@@ -237,7 +269,8 @@ public class TaskController {
                 List<String> picsURI = taskService.getPicsByTaskId(task_id);
                 returnData.put("commit_id", commit.getCommitid());
 
-                returnData.put("size", task.getSize());
+                //returnData.put("size", task.getSize());
+                returnData.put("size", DEFAULT_COMMIT_SIZE);
                 returnData.put("task_id", task.getTaskid());
                 returnData.put("type", task.getType());
                 returnData.put("pictures", picsURI);
@@ -245,7 +278,7 @@ public class TaskController {
             } else if (task.getType() == 1) {
 
                 returnData.put("commit_id", commit.getCommitid());
-                returnData.put("size", task.getSize());
+                returnData.put("size", DEFAULT_COMMIT_SIZE);
                 returnData.put("task_id", task.getTaskid());
                 returnData.put("type", task.getType());
             } else {

@@ -68,15 +68,16 @@ public class UserServiceImpl implements UserService {
 
     // TODO update password
     @Override
-    public User updateUser(Map<String, Object> user_info) {
-        int id = (Integer) user_info.get("userid");
+    public User updateUser(Map<String, Object> user_info) throws BaseException {
+
+        int id = (Integer) user_info.get("id");
         User user = userRepository.findByUserid(id);
         //TODO NO such user
         if (user == null)
-            return null;
+            throw new BaseException("user not found", String.format("can not find user by this id: %d", id), HttpStatus.NOT_FOUND);
         for (String key : user_info.keySet()) {
             Object value = user_info.get(key);
-            if (key.equals("userid"))
+            if (key.equals("id"))
                 continue;
             switch (key) {
                 case "email":
@@ -91,9 +92,11 @@ public class UserServiceImpl implements UserService {
                 case "avatar":
                     user.setAvatar((String) user_info.get(key));
                     break;
-                case "nick_name":
+                case "username":
                     user.setUsername((String) user_info.get(key));
                     break;
+                default:
+                    throw new BaseException("update fail", String.format("can not update this field: %s, you are not allowed or key error", key), HttpStatus.BAD_REQUEST);
 
             }
 
@@ -105,9 +108,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean verifyLogin(String email, String password) throws BaseException {
-       if(!userRepository.existsByEmail(email)){
-           throw new BaseException("wrong password or email","email not registered", HttpStatus.NOT_FOUND);
-       }
+        if (!userRepository.existsByEmail(email)) {
+            throw new BaseException("wrong password or email", "email not registered", HttpStatus.NOT_FOUND);
+        }
         User user = userRepository.findByEmail(email);
         //TODO generate error
         logger.info("raw password: " + password);
@@ -115,8 +118,8 @@ public class UserServiceImpl implements UserService {
         logger.info("hashed password: " + hashPassword(password));
         if (new BCryptPasswordEncoder().matches(password, user.getHashed_password())) {
             return true;
-        }else {
-            throw new BaseException("wrong password or email","wrong password",HttpStatus.BAD_REQUEST);
+        } else {
+            throw new BaseException("wrong password or email", "wrong password", HttpStatus.BAD_REQUEST);
         }
     }
 

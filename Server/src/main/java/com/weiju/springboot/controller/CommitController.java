@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -71,28 +72,33 @@ public class CommitController {
     @PreAuthorize("hasAnyRole('USER_ANNOTATION_COLLECTION')")
     public ResponseEntity<String> uploadCommit(@RequestBody Map<String, Map<String, Object>> payload) throws BaseException {
 
-        try {
-            logger.info("request body " + payload.toString());
-            Map<String, Object> commit_data = payload.get("data");
-            logger.info("commit data: " + commit_data);
 
-            int task_type = (int) commit_data.get("task_type");
-            logger.info("commit type:" + task_type);
-
-            switch (task_type) {
-                case 0: // Annotation
-                    logger.info("Annotation");
-                    return uploadAnnotationCommit(commit_data);
-                case 1: // Collection
-                    logger.info("Collection");
-                    return uploadCollectionCommit(commit_data);
-                default:
-                    throw new BaseException("wrong task type", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-
-        } catch (JSONException e) {
-            throw new BaseException("JSONObject not found", HttpStatus.NOT_FOUND, e);
+        logger.info("request body " + payload.toString());
+        Map<String, Object> commit_data = payload.get("data");
+        if (commit_data == null) {
+            throw new BaseException("json error", "con not find 'data'", HttpStatus.NOT_FOUND);
         }
+        logger.info("commit data: " + commit_data);
+
+        if (commit_data.get("task_type") == null) {
+            throw new BaseException("json error", "con not find 'task_type'", HttpStatus.NOT_FOUND);
+        }
+        int task_type = (int) commit_data.get("task_type");
+
+
+        logger.info("commit type:" + task_type);
+
+        switch (task_type) {
+            case 0: // Annotation
+                logger.info("Annotation");
+                return uploadAnnotationCommit(commit_data);
+            case 1: // Collection
+                logger.info("Collection");
+                return uploadCollectionCommit(commit_data);
+            default:
+                throw new BaseException("wrong task type", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
 
     }
 
@@ -152,6 +158,9 @@ public class CommitController {
                 throw new BaseException("commit_id not found", HttpStatus.NOT_FOUND);
             }
 
+            if (commit.getTask().getType() != 1) {
+                throw new BaseException("task_type not match", "this not a collection task", HttpStatus.BAD_REQUEST);
+            }
             // construct response data meta error format
             JSONObject response = new JSONObject();
             JSONObject data = new JSONObject();
@@ -193,6 +202,10 @@ public class CommitController {
                 throw new BaseException("commit_id not found", HttpStatus.NOT_FOUND);
             }
 
+            if (commit.getTask().getType() != 0) {
+                throw new BaseException("task_type not match", "this not a annotation task", HttpStatus.BAD_REQUEST);
+            }
+
             for (Map<String, String> result : results) {
                 String picture_url = result.get("picture_url");
                 String annotation_json = result.get("annotation_json");
@@ -212,14 +225,19 @@ public class CommitController {
                 logger.info(" annotation  path :" + relativePath);
                 String jsonName = fileService.getNewFilename("-" + String.valueOf(committer_id) + ".json");
                 logger.info("annotation_jsonName: " + jsonName);
-                fileService.storeString(annotation_json, jsonName, relativePath);
+                try {
+                    fileService.storeString(annotation_json, jsonName, relativePath);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    throw new BaseException("file not found", String.format("can not find file at %s", relativePath), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
                 // save commit data
                 commitDataService.save(commit, relativePath + "/" + jsonName);
 
             }
 
 
-        } catch (Exception e) {
+        } catch (JSONException e) {
             e.printStackTrace();
             throw new BaseException("json object field not found", HttpStatus.NOT_FOUND, e);
 

@@ -37,10 +37,10 @@ public class UserController {
     public ResponseEntity<Object> getUserProfile(@PathVariable("id") int userid) throws BaseException {
         logger.info("get user info : " + String.valueOf(userid));
         User user = userService.getUserProfile(userid);
-        if (user==null){
-            throw  new BaseException("can not find this user","wrong user_id",HttpStatus.NOT_FOUND);
+        if (user == null) {
+            throw new BaseException("can not find this user", "wrong user_id", HttpStatus.NOT_FOUND);
         }
-        Map<String,Object> res = new LinkedHashMap<>();
+        Map<String, Object> res = new LinkedHashMap<>();
         res.put("data", user);
         logger.info("construct response");
         return new ResponseEntity<>(res, HttpStatus.OK);
@@ -50,8 +50,17 @@ public class UserController {
     //TODO check id
     //更新用户信息
     @PatchMapping(value = "/{id}/")
-    public ResponseEntity<Object> updateUserProfile(@PathVariable("id") int userid, @RequestBody Map<String, Object> payload) throws Exception {
+    public ResponseEntity<Object> updateUserProfile(@PathVariable("id") int userid, @RequestBody Map<String, Object> payload) throws BaseException {
         Map<String, Object> user_data = (Map<String, Object>) payload.get("data");
+        if (user_data == null) {
+            throw new BaseException("json error", "can not find field 'data'", HttpStatus.NOT_FOUND);
+        }
+        if (user_data.get("id") == null) {
+            throw new BaseException("json error", "can not find field 'id'", HttpStatus.NOT_FOUND);
+        }
+        if ((int) user_data.get("id") != userid) {
+            throw new BaseException("json error", "id not match", HttpStatus.BAD_REQUEST);
+        }
         User updated_user = userService.updateUser(user_data);
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("data", updated_user);
