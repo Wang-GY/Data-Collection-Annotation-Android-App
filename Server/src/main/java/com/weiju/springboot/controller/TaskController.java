@@ -125,15 +125,15 @@ public class TaskController {
             taskJSON.put("description", task.getDescription());
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
-            taskJSON.put("pictures", taskService.getPicsByTaskId(task.getTaskid()));
+            //taskJSON.put("pictures", taskService.getPicsByTaskId(task.getTaskid()));
             taskJSON.put("formatter", new JSONObject(task.getFormatter()));
             taskJSON.put("cover", taskService.getCoverByTaskId(task.getTaskid()));
             tasksInfo.add(taskJSON);
         }
 
 
-        taskData.put("tasks", tasksInfo);
-        response.put("data", taskData);
+        //taskData.put("tasks", tasksInfo);
+        response.put("data", tasksInfo);
 
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response.toString());
         //return new ResponseEntity<>(response.toString(), HttpStatus.OK);
@@ -173,7 +173,7 @@ public class TaskController {
             taskJSON.put("user_id", task.getCreator().getUserid());
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
-            taskJSON.put("pictures", fileURIs);
+            //taskJSON.put("pictures", fileURIs);
             if (!fileURIs.isEmpty()) {
                 taskJSON.put("cover", fileURIs.get(0));
             }
@@ -274,7 +274,7 @@ public class TaskController {
                 returnData.put("size", DEFAULT_COMMIT_SIZE);
                 returnData.put("task_id", task.getTaskid());
                 returnData.put("type", task.getType());
-                returnData.put("pictures", picsURI);
+                //returnData.put("pictures", picsURI);
 
             } else if (task.getType() == 1) {
 
