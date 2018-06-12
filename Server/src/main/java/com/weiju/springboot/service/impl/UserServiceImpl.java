@@ -70,14 +70,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(Map<String, Object> user_info) throws BaseException {
 
-        int id = (Integer) user_info.get("userid");
+        int id = (Integer) user_info.get("user_id");
         User user = userRepository.findByUserid(id);
         //TODO NO such user
         if (user == null)
             throw new BaseException("user not found", String.format("can not find user by this id: %d", id), HttpStatus.NOT_FOUND);
         for (String key : user_info.keySet()) {
             Object value = user_info.get(key);
-            if (key.equals("userid"))
+            if (key.equals("user_id"))
                 continue;
             switch (key) {
                 case "email":

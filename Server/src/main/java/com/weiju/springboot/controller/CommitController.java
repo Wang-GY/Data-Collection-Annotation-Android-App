@@ -45,6 +45,8 @@ public class CommitController {
     final CommitDataRepository commitDataRepository;
     final CommitService commitService;
     final CommitDataService commitDataService;
+    static final int ANNOTATION = 0;
+    static final int COLLECTION = 1;
 
     @Autowired
     public CommitController(CommitRepository commitRepository, FileService fileService, UserRepository userRepository,
@@ -92,9 +94,9 @@ public class CommitController {
             case 0: // Annotation
                 logger.info("Annotation");
                 return uploadAnnotationCommit(commit_data);
-            case 1: // Collection
-                logger.info("Collection");
-                return uploadCollectionCommit(commit_data);
+//            case 1: // Collection
+//                logger.info("Collection");
+//                return uploadCollectionCommit(commit_data);
             default:
                 throw new BaseException("wrong task type", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -118,7 +120,14 @@ public class CommitController {
         // TODO: double check has already committed
         Commit commit = commitRepository.findByCommitid(commitid);
         if (commit == null) {
-            throw new BaseException("can not find commit", HttpStatus.NOT_FOUND);
+            throw new BaseException("commit fail", "can not find commit", HttpStatus.NOT_FOUND);
+        }
+        if (commit.getTask().getType() != COLLECTION) {
+            throw new BaseException("commit fail", "try to upload pictures to a annotation job", HttpStatus.BAD_REQUEST);
+        }
+
+        if (multipartFiles.size() > commit.getSize() - commit.getCommitDataList().size()) {
+            throw new BaseException("Commit too many entries", String.format("you can upload at most %d entries but you are trying to upload %d entries", commit.getSize() - commit.getCommitDataList().size(), multipartFiles.size()), HttpStatus.BAD_REQUEST);
         }
         int taskid = commit.getTask().getTaskid();
         String id = String.valueOf(taskid);
@@ -134,7 +143,7 @@ public class CommitController {
     }
 
     /**
-     * 处理采集任务的提交
+     * 处理采集任务的提交申请
      *
      * @param commit_data
      * @return
@@ -205,7 +214,9 @@ public class CommitController {
             if (commit.getTask().getType() != 0) {
                 throw new BaseException("task_type not match", "this not a annotation task", HttpStatus.BAD_REQUEST);
             }
-
+            if (results.size() > commit.getSize() - commit.getCommitDataList().size()) {
+                throw new BaseException("Commit too many entries", String.format("you can upload at most %d entries but you are trying to upload %d entries", commit.getSize() - commit.getCommitDataList().size(), results.size()), HttpStatus.BAD_REQUEST);
+            }
             for (Map<String, String> result : results) {
                 String picture_url = result.get("picture_url");
                 String annotation_json = result.get("annotation_json");

@@ -143,4 +143,15 @@ public class CommitServiceImpl implements CommitService {
         return commitPaginationAndSortingRepository.findByTask(task, pageRequest);
     }
 
+    /**
+     * return true if commit finish
+     *
+     * @param commit
+     * @return
+     */
+    @Override
+    public boolean check_commit_finish(Commit commit) {
+        return commit.getCommitDataList().size() == commit.getSize();
+    }
+
 }

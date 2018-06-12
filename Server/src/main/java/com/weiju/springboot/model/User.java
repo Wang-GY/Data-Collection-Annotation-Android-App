@@ -2,6 +2,7 @@ package com.weiju.springboot.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.util.List;
@@ -15,7 +16,7 @@ public class User {
     @Id
     @Column(name = "userid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
+    @JsonProperty("user_id")
     private int userid;
 
     @Column(name = "email")

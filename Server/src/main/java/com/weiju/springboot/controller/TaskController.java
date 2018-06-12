@@ -4,6 +4,7 @@ import com.weiju.springboot.exception.BaseException;
 import com.weiju.springboot.model.Commit;
 import com.weiju.springboot.model.Task;
 import com.weiju.springboot.model.User;
+import com.weiju.springboot.repository.CommitRepository;
 import com.weiju.springboot.repository.TaskRepository;
 import com.weiju.springboot.service.CommitService;
 import com.weiju.springboot.service.FileService;
@@ -42,7 +43,9 @@ public class TaskController {
     private final UserService userService;
     private static Logger logger = LoggerFactory.getLogger(FileService.class);
     private static FileSystem fs = FileSystems.getDefault();
+    private static CommitRepository commitRepository;
     private static final int DEFAULT_COMMIT_SIZE = 10;
+
 
     @Autowired
     private final Environment environment;
@@ -50,12 +53,16 @@ public class TaskController {
 
     @Autowired
     public TaskController(TaskRepository taskRepository, TaskService taskService,
-                          Environment environment, CommitService commitService, UserService userService) {
+                          Environment environment, CommitService commitService,
+                          CommitRepository commitRepository,
+                          UserService userService
+    ) {
         this.taskRepository = taskRepository;
         this.taskService = taskService;
         this.environment = environment;
         this.commitService = commitService;
         this.userService = userService;
+        this.commitRepository = commitRepository;
     }
 
     /**
@@ -190,7 +197,7 @@ public class TaskController {
     }
 
 
-    @PatchMapping("/{id}")
+    @PatchMapping(value = "/{id}", produces = {"application/json;**charset=UTF-8**"})
     public ResponseEntity<String> updateTask(@PathVariable(value = "id") String id,
                                              @RequestBody Map<String, Map<String, Object>> payload) throws BaseException {
         JSONObject data = new JSONObject();
@@ -253,6 +260,7 @@ public class TaskController {
         int task_id = (Integer) data.get("task_id");
         int user_id = (Integer) data.get("user_id");
 
+
         Task task = taskService.getTaskProfile(task_id);
         if (task == null) {
             throw new BaseException("Task not found", "can not find task by this id", HttpStatus.NOT_FOUND);
@@ -263,9 +271,14 @@ public class TaskController {
         }
 
         JSONObject returnData = new JSONObject();
-
+        List<Commit> commits = commitRepository.findByCommitterAndAndTask(user, task);
+        for (Commit temp : commits) {
+            if (!commitService.check_commit_finish(temp)) {
+                throw new BaseException(String.format("you have unfinished commit of this task "), String.format("commit_id: %d, rest: %d entries, user_id: %d task_id: %d", temp.getCommitid(), temp.getSize() - temp.getCommitDataList().size(), user_id, task_id), HttpStatus.BAD_REQUEST);
+            }
+        }
         // TODO fix commit size
-        Commit commit = commitService.save(task_id, user_id, task.getSize());
+        Commit commit = commitService.save(task_id, user_id, DEFAULT_COMMIT_SIZE);
         if (task != null && user != null) {
             if (task.getType() == 0) {
 
@@ -287,8 +300,9 @@ public class TaskController {
             } else {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-
-            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(returnData.toString());
+            JSONObject response = new JSONObject();
+            response.put("data", returnData);
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response.toString());
             // return new ResponseEntity<>(returnData.toString(), HttpStatus.OK);
 
         } else {

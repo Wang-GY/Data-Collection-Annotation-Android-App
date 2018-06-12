@@ -55,12 +55,13 @@ public class UserController {
         if (user_data == null) {
             throw new BaseException("json error", "can not find field 'data'", HttpStatus.NOT_FOUND);
         }
-        if (user_data.get("userid") == null) {
-            throw new BaseException("json error", "can not find field 'userid'", HttpStatus.NOT_FOUND);
+        if (user_data.get("user_id") == null) {
+            throw new BaseException("json error", "can not find field 'user_id'", HttpStatus.NOT_FOUND);
         }
-        if ((int) user_data.get("userid") != userid) {
+        if ((int) user_data.get("user_id") != userid) {
             throw new BaseException("json error", "id not match", HttpStatus.BAD_REQUEST);
         }
+
         User updated_user = userService.updateUser(user_data);
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("data", updated_user);

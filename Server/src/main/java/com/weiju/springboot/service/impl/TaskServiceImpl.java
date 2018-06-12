@@ -94,7 +94,8 @@ public class TaskServiceImpl implements TaskService {
                 //TODO update deadline and formatter
                 switch ((String) entry.getKey()) {
                     case "name":
-                        task.setName(entry.getValue().toString());
+                        logger.info((String) entry.getValue());
+                        task.setName((String) entry.getValue());
                         break;
                     case "description":
                         task.setDescription((String) entry.getValue());
@@ -118,8 +119,11 @@ public class TaskServiceImpl implements TaskService {
                     case "cover":
                         task.setCover((String) entry.getValue());
                         break;
-                    default:
-                        throw new BaseException("update fail", String.format("can not update this field: %s, you are not allowed or key error", (String) entry.getKey()), HttpStatus.BAD_REQUEST);
+                    case "start_time":
+                        task.setStart_time((String) entry.getValue());
+                        break;
+//                    default:
+//                        throw new BaseException("update fail", String.format("can not update this field: %s, you are not allowed or key error", (String) entry.getKey()), HttpStatus.BAD_REQUEST);
 
                 }
             }
@@ -136,7 +140,12 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findAll(pageable);
     }
 
-
+    /**
+     * get all pictures
+     *
+     * @param task_id
+     * @return
+     */
     @Override
     public List<String> getPicsByTaskId(int task_id) {
         String basePath = Paths.get(".").toAbsolutePath().normalize().toString();
@@ -161,6 +170,29 @@ public class TaskServiceImpl implements TaskService {
             }
         }
         return fileURIs;
+    }
+
+    /**
+     * get task cover by task id paged
+     *
+     * @param task_id
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public List<String> getPicsByTaskId(int task_id, int pageNum, int pageSize) throws BaseException {
+        List<String> all = getPicsByTaskId(task_id);
+        if (pageNum * pageSize >= 0 && pageNum * pageSize <= all.size()) {
+            try {
+                return all.subList(pageNum * pageSize, (pageNum + 1) * pageSize);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                return all.subList(pageNum * pageSize, all.size());
+            }
+
+        } else {
+            throw new BaseException("", "", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**

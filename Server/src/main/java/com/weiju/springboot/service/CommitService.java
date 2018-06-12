@@ -15,4 +15,11 @@ public interface CommitService {
     Page<Commit> findByCommitterAndAndTask(User committer, Task task, Integer pageNum, Integer pageSize);
 
     Page<Commit> findByTask(Task task, Integer pageNum, Integer pageSize);
+
+    /**
+     * return true if a commit is finished
+     * @param commit
+     * @return
+     */
+    boolean check_commit_finish(Commit commit);
 }
