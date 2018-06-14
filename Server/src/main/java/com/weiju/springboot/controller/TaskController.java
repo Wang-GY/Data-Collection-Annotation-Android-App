@@ -2,6 +2,7 @@ package com.weiju.springboot.controller;
 
 import com.weiju.springboot.exception.BaseException;
 import com.weiju.springboot.model.Commit;
+import com.weiju.springboot.model.CommitData;
 import com.weiju.springboot.model.Task;
 import com.weiju.springboot.model.User;
 import com.weiju.springboot.repository.CommitRepository;
@@ -264,6 +265,10 @@ public class TaskController {
         User user = userService.getUserProfile(user_id);
         if (user == null) {
             throw new BaseException("User not found", "can not find user by this id", HttpStatus.NOT_FOUND);
+        }
+
+        if (taskService.isTaskPassDeadline(task)) {
+            throw new BaseException("try to apply after deadline", "deadline: " + task.getDeadline(), HttpStatus.BAD_REQUEST);
         }
 
         JSONObject returnData = new JSONObject();

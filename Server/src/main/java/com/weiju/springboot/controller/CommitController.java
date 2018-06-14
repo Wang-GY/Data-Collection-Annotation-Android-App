@@ -10,6 +10,7 @@ import com.weiju.springboot.service.CommitDataService;
 import com.weiju.springboot.service.CommitService;
 import com.weiju.springboot.service.FileService;
 
+import com.weiju.springboot.service.TaskService;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -26,9 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.FileNotFoundException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 处理commit相关api
@@ -45,6 +47,7 @@ public class CommitController {
     final CommitDataRepository commitDataRepository;
     final CommitService commitService;
     final CommitDataService commitDataService;
+    final TaskService taskService;
     static final int ANNOTATION = 0;
     static final int COLLECTION = 1;
 
@@ -53,7 +56,8 @@ public class CommitController {
                             TaskRepository taskRepository,
                             CommitDataRepository commitDataRepository,
                             CommitService commitService,
-                            CommitDataService commitDataService) {
+                            CommitDataService commitDataService,
+                            TaskService taskService) {
         this.commitRepository = commitRepository;
         this.fileService = fileService;
         this.userRepository = userRepository;
@@ -61,11 +65,12 @@ public class CommitController {
         this.commitDataRepository = commitDataRepository;
         this.commitService = commitService;
         this.commitDataService = commitDataService;
+        this.taskService = taskService;
     }
 
     /**
      * 用户上传一个提交
-     * 分别处理采集任务和标注任务
+     * 处理标注任务
      *
      * @param payload request body
      * @return
@@ -74,7 +79,6 @@ public class CommitController {
     @PreAuthorize("hasAnyRole('USER_ANNOTATION_COLLECTION')")
     public ResponseEntity<String> uploadCommit(@RequestBody Map<String, Map<String, Object>> payload) throws BaseException {
 
-
         logger.info("request body " + payload.toString());
         Map<String, Object> commit_data = payload.get("data");
         if (commit_data == null) {
@@ -82,25 +86,68 @@ public class CommitController {
         }
         logger.info("commit data: " + commit_data);
 
-        if (commit_data.get("task_type") == null) {
-            throw new BaseException("json error", "con not find 'task_type'", HttpStatus.NOT_FOUND);
+        try {
+            Integer commit_id = (Integer) commit_data.get("commit_id");
+            List<Map<String, String>> results = (List<Map<String, String>>) commit_data.get("result");
+
+            if (commit_id == null || results == null) {
+                throw new BaseException("json key error: commit_id or results  not found", HttpStatus.NOT_FOUND);
+            }
+
+            Commit commit = commitRepository.findByCommitid(commit_id);
+
+            if (commit == null) {
+                throw new BaseException("commit not found", String.format("can not find commit by commid_id:%d", commit_id), HttpStatus.NOT_FOUND);
+            }
+
+            if (commit.getTask().getType() != ANNOTATION) {
+                throw new BaseException("task_type not match", "this not a annotation task", HttpStatus.BAD_REQUEST);
+            }
+            List<CommitData> commitDatas = commit.getCommitDataList();
+            if (taskService.isTaskPassDeadline(commit.getTask())) {
+                throw new BaseException("try to commit after deadline", "deadline: " + commit.getTask().getDeadline(), HttpStatus.BAD_REQUEST);
+            }
+            if (results.size() > commit.getSize() - commitDatas.size()) {
+                throw new BaseException("Commit too many entries", String.format("you can upload at most %d entries but you are trying to upload %d entries", commit.getSize() - commit.getCommitDataList().size(), results.size()), HttpStatus.BAD_REQUEST);
+            }
+            for (Map<String, String> result : results) {
+                String picture_url = result.get("picture_url");
+                String annotation_json = result.get("annotation_json");
+                if (picture_url == null || annotation_json == null) {
+                    throw new BaseException("json key error: picture_url or annotation_json not found", HttpStatus.NOT_FOUND);
+                }
+                String relativePath = fileService.getRelativePathByUrl(picture_url);
+                logger.info("picture path : " + relativePath);
+                String pictureName = fileService.getFilenameByRelativePath(relativePath);
+
+                // construct annotation_json path
+                relativePath = fileService.getParentPath(relativePath);
+                logger.info("picture parent path: " + relativePath);
+                relativePath = relativePath.replace("pictures", "annotations");// change directory
+                relativePath = relativePath + "/" + pictureName;
+
+                logger.info(" annotation  path :" + relativePath);
+                String jsonName = fileService.getNewFilename("-" + String.valueOf(commit.getCommitter().getUserid()) + ".json");
+                logger.info("annotation_jsonName: " + jsonName);
+                try {
+                    fileService.storeString(annotation_json, jsonName, relativePath);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    throw new BaseException("file not found", String.format("can not find file at %s", relativePath), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                // save commit data
+                commitDataService.save(commit, relativePath + "/" + jsonName);
+
+            }
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            throw new BaseException("json object field not found", HttpStatus.NOT_FOUND, e);
+
         }
-        int task_type = (int) commit_data.get("task_type");
 
-
-        logger.info("commit type:" + task_type);
-
-        switch (task_type) {
-            case 0: // Annotation
-                logger.info("Annotation");
-                return uploadAnnotationCommit(commit_data);
-//            case 1: // Collection
-//                logger.info("Collection");
-//                return uploadCollectionCommit(commit_data);
-            default:
-                throw new BaseException("wrong task type", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+        return new ResponseEntity<>(HttpStatus.CREATED);
 
     }
 
@@ -126,6 +173,10 @@ public class CommitController {
             throw new BaseException("commit fail", "try to upload pictures to a annotation job", HttpStatus.BAD_REQUEST);
         }
 
+        if (taskService.isTaskPassDeadline(commit.getTask())) {
+            throw new BaseException("try to commit after deadline", "deadline: " + commit.getTask().getDeadline(), HttpStatus.BAD_REQUEST);
+        }
+
         if (multipartFiles.size() > commit.getSize() - commit.getCommitDataList().size()) {
             throw new BaseException("Commit too many entries", String.format("you can upload at most %d entries but you are trying to upload %d entries", commit.getSize() - commit.getCommitDataList().size(), multipartFiles.size()), HttpStatus.BAD_REQUEST);
         }
@@ -142,77 +193,6 @@ public class CommitController {
         //return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
     }
 
-
-    /**
-     * 处理标注任务的提交
-     *
-     * @param commit_data
-     * @return
-     */
-    private ResponseEntity<String> uploadAnnotationCommit(Map<String, Object> commit_data) throws BaseException {
-        try {
-            Integer task_id = (Integer) commit_data.get("task_id");
-            Integer committer_id = (Integer) commit_data.get("user_id");
-            Integer size = (Integer) commit_data.get("size");
-            Integer commit_id = (Integer) commit_data.get("commit_id");
-            List<Map<String, String>> results = (List<Map<String, String>>) commit_data.get("result");
-
-            if (task_id == null || committer_id == null || size == null || results == null) {
-                throw new BaseException("json key error: task_id or user_id or size or result not found", HttpStatus.NOT_FOUND);
-            }
-
-            //Commit commit = commitService.save(task_id, committer_id, size);
-            Commit commit = commitRepository.findByCommitid(commit_id);
-
-            if (commit == null) {
-                throw new BaseException("commit_id not found", HttpStatus.NOT_FOUND);
-            }
-
-            if (commit.getTask().getType() != 0) {
-                throw new BaseException("task_type not match", "this not a annotation task", HttpStatus.BAD_REQUEST);
-            }
-            if (results.size() > commit.getSize() - commit.getCommitDataList().size()) {
-                throw new BaseException("Commit too many entries", String.format("you can upload at most %d entries but you are trying to upload %d entries", commit.getSize() - commit.getCommitDataList().size(), results.size()), HttpStatus.BAD_REQUEST);
-            }
-            for (Map<String, String> result : results) {
-                String picture_url = result.get("picture_url");
-                String annotation_json = result.get("annotation_json");
-                if (picture_url == null || annotation_json == null) {
-                    throw new BaseException("json key error: picture_url or annotation_json not found", HttpStatus.NOT_FOUND);
-                }
-                String relativePath = fileService.getRelativePathByUrl(picture_url);
-                logger.info("picture path : " + relativePath);
-                String pictureName = fileService.getFilenameByRelativePath(relativePath);
-
-                // construct annotation_json path
-                relativePath = fileService.getParentPath(relativePath);
-                logger.info("picture parent path: " + relativePath);
-                relativePath = relativePath.replace("pictures", "annotations");// change directory
-                relativePath = relativePath + "/" + pictureName;
-
-                logger.info(" annotation  path :" + relativePath);
-                String jsonName = fileService.getNewFilename("-" + String.valueOf(committer_id) + ".json");
-                logger.info("annotation_jsonName: " + jsonName);
-                try {
-                    fileService.storeString(annotation_json, jsonName, relativePath);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    throw new BaseException("file not found", String.format("can not find file at %s", relativePath), HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-                // save commit data
-                commitDataService.save(commit, relativePath + "/" + jsonName);
-
-            }
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-            throw new BaseException("json object field not found", HttpStatus.NOT_FOUND, e);
-
-        }
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
 
     /**
      * 给定userid,task_id,limit 返回

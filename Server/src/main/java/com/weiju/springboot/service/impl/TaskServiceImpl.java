@@ -1,6 +1,5 @@
 package com.weiju.springboot.service.impl;
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import com.weiju.springboot.exception.BaseException;
 import com.weiju.springboot.model.Task;
 import com.weiju.springboot.repository.TaskRepository;
@@ -23,9 +22,8 @@ import java.io.File;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 @Service("Task srevice")
 public class TaskServiceImpl implements TaskService {
@@ -114,6 +112,14 @@ public class TaskServiceImpl implements TaskService {
                         task.setFormatter(jsonObject.toString());
                         break;
                     case "deadline":
+                        try {
+                            Long.parseLong((String) entry.getValue());
+                        } catch (NumberFormatException e) {
+                            throw new BaseException("update fail", "start_time can not cast to long", HttpStatus.BAD_REQUEST);
+                        }
+                        if (new Date(Long.parseLong((String) entry.getValue())).before(new Date(Long.parseLong(task.getStart_time())))) {
+                            throw new BaseException("update fail", "deadline before start_time", HttpStatus.BAD_REQUEST);
+                        }
                         task.setDeadline((String) entry.getValue());
                         break;
                     case "type":
@@ -123,6 +129,12 @@ public class TaskServiceImpl implements TaskService {
                         task.setCover((String) entry.getValue());
                         break;
                     case "start_time":
+                        try {
+                            Long.parseLong((String) entry.getValue());
+                        } catch (NumberFormatException e) {
+                            throw new BaseException("json error", "start_time can not cast to long", HttpStatus.BAD_REQUEST);
+                        }
+
                         task.setStart_time((String) entry.getValue());
                         break;
 //                    default:
@@ -216,4 +228,22 @@ public class TaskServiceImpl implements TaskService {
 
     }
 
+    /**
+     * return true if the passed deadline
+     *
+     * @param task
+     * @return
+     * @throws BaseException
+     */
+    @Override
+    public boolean isTaskPassDeadline(Task task) throws BaseException {
+        try {
+            Long.parseLong(task.getDeadline());
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            throw new BaseException("deadline format error", String.format("deadline %s can not be casted to string", task.getDeadline()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        Date deadline = new Date(Long.parseLong(task.getDeadline()));
+        return deadline.before(new Date());
+    }
 }

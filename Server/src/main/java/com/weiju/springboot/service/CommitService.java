@@ -1,5 +1,6 @@
 package com.weiju.springboot.service;
 
+import com.weiju.springboot.exception.BaseException;
 import com.weiju.springboot.model.Commit;
 import com.weiju.springboot.model.Task;
 import com.weiju.springboot.model.User;

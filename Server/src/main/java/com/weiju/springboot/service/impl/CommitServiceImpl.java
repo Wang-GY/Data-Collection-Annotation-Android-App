@@ -1,5 +1,6 @@
 package com.weiju.springboot.service.impl;
 
+import com.weiju.springboot.exception.BaseException;
 import com.weiju.springboot.model.Commit;
 import com.weiju.springboot.model.Task;
 import com.weiju.springboot.model.User;
@@ -14,14 +15,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -64,7 +67,7 @@ public class CommitServiceImpl implements CommitService {
         Task task = taskRepository.findByTaskid(task_id);
 
         Commit commit = new Commit();
-        commit.setCommitTime(Instant.now().toString());
+        commit.setCommitTime(String.valueOf(new Date().getTime()));
         commit.setSize(size);
         commit.setCommitter(committer);
         commit.setTask(task);
@@ -153,5 +156,4 @@ public class CommitServiceImpl implements CommitService {
     public boolean check_commit_finish(Commit commit) {
         return commit.getCommitDataList().size() == commit.getSize();
     }
-
 }

@@ -310,7 +310,7 @@ public class FileServiceImpl implements FileService {
      */
     @Override
     public String getFileTypeByFileName(String fileName) throws BaseException {
-        String[] items = fileName.split(".");
+        String[] items = fileName.split("\\.");
         if (items.length == 0) {
             throw new BaseException("invalid filename", "file name can not be null", HttpStatus.INTERNAL_SERVER_ERROR);
         }

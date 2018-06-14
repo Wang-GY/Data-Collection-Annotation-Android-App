@@ -26,4 +26,6 @@ public interface TaskService {
     List<String> getPicsByTaskId(int task_id, int pageNum, int pageSize) throws BaseException;
 
     String getCoverByTaskId(int task_id) throws BaseException;
+
+    boolean isTaskPassDeadline(Task task) throws BaseException;
 }
