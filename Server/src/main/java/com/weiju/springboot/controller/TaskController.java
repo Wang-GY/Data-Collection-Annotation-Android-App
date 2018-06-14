@@ -111,19 +111,9 @@ public class TaskController {
         JSONObject response = new JSONObject();
         JSONObject taskData = new JSONObject();
 
-        //Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Pageable pageable = new PageRequest(pageNum, pageSize);
-//
-//        if (((PageRequest) pageable).previous() != null) {
-//            response.put("previous", "http://206.189.35.98:12000/api/tasks/?offset="
-//                    + ((PageRequest) pageable).previous().getPageNumber() +
-//                    "&limit=" + ((PageRequest) pageable).previous().getOffset());
-//        }
-//        if (pageable.next() != null) {
-//            response.put("next", "http://206.189.35.98:12000/api/tasks/?offset="
-//                    + pageable.next().getPageNumber() +
-//                    "&limit=" + pageable.next().getOffset());
-//        }
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        //Pageable pageable = new PageRequest(pageNum, pageSize);
+
 
         Page<Task> tasks = taskRepository.findAll(pageable);
         List<JSONObject> tasksInfo = new LinkedList<>();
