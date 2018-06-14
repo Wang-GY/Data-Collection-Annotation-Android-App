@@ -90,8 +90,15 @@ public class CommitController {
             Integer commit_id = (Integer) commit_data.get("commit_id");
             List<Map<String, String>> results = (List<Map<String, String>>) commit_data.get("result");
 
-            if (commit_id == null || results == null) {
-                throw new BaseException("json key error: commit_id or results  not found", HttpStatus.NOT_FOUND);
+            List<String> pictures = (List<String>) commit_data.get("pictures");
+            /*
+            * Map<String, Object> map = (Map<String, Object>) entry.getValue();
+                        JSONObject jsonObject = new JSONObject(map);
+                        task.setFormatter(jsonObject.toString());
+            * */
+            List<String> tags = (List<String>) commit_data.get("tags");
+            if (commit_id == null || pictures == null || tags == null) {
+                throw new BaseException("json key error: commit_id or pictures or tags  not found", HttpStatus.NOT_FOUND);
             }
 
             Commit commit = commitRepository.findByCommitid(commit_id);
@@ -107,14 +114,20 @@ public class CommitController {
             if (taskService.isTaskPassDeadline(commit.getTask())) {
                 throw new BaseException("try to commit after deadline", "deadline: " + commit.getTask().getDeadline(), HttpStatus.BAD_REQUEST);
             }
-            if (results.size() > commit.getSize() - commitDatas.size()) {
+            if (pictures.size() != tags.size()) {
+                throw new BaseException("json error", "pictures and tags can not match", HttpStatus.BAD_REQUEST);
+            }
+
+            if (pictures.size() > commit.getSize() - commitDatas.size()) {
                 throw new BaseException("Commit too many entries", String.format("you can upload at most %d entries but you are trying to upload %d entries", commit.getSize() - commit.getCommitDataList().size(), results.size()), HttpStatus.BAD_REQUEST);
             }
-            for (Map<String, String> result : results) {
-                String picture_url = result.get("picture_url");
-                String annotation_json = result.get("annotation_json");
-                if (picture_url == null || annotation_json == null) {
-                    throw new BaseException("json key error: picture_url or annotation_json not found", HttpStatus.NOT_FOUND);
+
+            for (int i = 0; i < pictures.size(); i++) {
+                String picture_url = pictures.get(i);
+                String tag = tags.get(i);
+
+                if (picture_url == null || tag == null) {
+                    throw new BaseException("json key error: picture_url or tag not found", HttpStatus.NOT_FOUND);
                 }
                 String relativePath = fileService.getRelativePathByUrl(picture_url);
                 logger.info("picture path : " + relativePath);
@@ -130,7 +143,7 @@ public class CommitController {
                 String jsonName = fileService.getNewFilename("-" + String.valueOf(commit.getCommitter().getUserid()) + ".json");
                 logger.info("annotation_jsonName: " + jsonName);
                 try {
-                    fileService.storeString(annotation_json, jsonName, relativePath);
+                    fileService.storeString(tag, jsonName, relativePath);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                     throw new BaseException("file not found", String.format("can not find file at %s", relativePath), HttpStatus.INTERNAL_SERVER_ERROR);
