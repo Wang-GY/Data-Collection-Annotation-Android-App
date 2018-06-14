@@ -295,8 +295,10 @@ public class FileServiceImpl implements FileService {
     }
     */
     @Override
-    public String getNewFilename(String oldFilename) {
-        return Instant.now().toString().replace(":", "-") + oldFilename;
+    public String getNewFilename(String oldFilename) throws BaseException {
+        String uuid = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+        String file_type = getFileTypeByFileName(oldFilename);
+        return Instant.now().toString().replace(":", "-") + uuid + "." + file_type;
     }
 
 
@@ -307,8 +309,11 @@ public class FileServiceImpl implements FileService {
      * @return
      */
     @Override
-    public String getFileTypeByFileName(String fileName) {
+    public String getFileTypeByFileName(String fileName) throws BaseException {
         String[] items = fileName.split(".");
+        if (items.length == 0) {
+            throw new BaseException("invalid filename", "file name can not be null", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         return items[items.length - 1];
     }
 }

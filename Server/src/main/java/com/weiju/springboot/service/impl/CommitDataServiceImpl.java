@@ -1,5 +1,6 @@
 package com.weiju.springboot.service.impl;
 
+import com.weiju.springboot.exception.BaseException;
 import com.weiju.springboot.model.Commit;
 import com.weiju.springboot.model.CommitData;
 import com.weiju.springboot.repository.CommitDataRepository;
@@ -62,7 +63,7 @@ public class CommitDataServiceImpl implements CommitDataService {
      *
      * @param commitDataList
      */
-    public List<Map<String, String>> getCommitDataResult(List<CommitData> commitDataList) throws IOException {
+    public List<Map<String, String>> getCommitDataResult(List<CommitData> commitDataList) throws IOException, BaseException {
         if (commitDataList == null)
             return null;
         Map<String, String> result = new LinkedHashMap<>();

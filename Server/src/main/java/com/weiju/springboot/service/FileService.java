@@ -58,7 +58,7 @@ public interface FileService {
 
     //void deleteAll(Path path);
 
-    String getNewFilename(String oldfilename);
+    String getNewFilename(String oldfilename) throws BaseException;
 
-    String getFileTypeByFileName(String fileName);
+    String getFileTypeByFileName(String fileName) throws BaseException;
 }
