@@ -1,5 +1,6 @@
 package com.weiju.springboot.controller;
 
+import ch.qos.logback.core.pattern.util.RegularEscapeUtil;
 import com.weiju.springboot.exception.BaseException;
 import com.weiju.springboot.model.Commit;
 import com.weiju.springboot.model.CommitData;
@@ -98,6 +99,30 @@ public class TaskController {
 //        return new ResponseEntity(HttpStatus.CREATED);
     }
 
+    /**
+     * get formatter by task id
+     *
+     * @param task_id
+     * @return
+     * @throws BaseException
+     */
+    @GetMapping("/{task_id}/formatter")
+    public ResponseEntity<String> getTaskFormatter(@PathVariable(value = "task_id", required = true) int task_id) throws BaseException {
+        logger.info("get task formatter");
+        Task task = taskRepository.findByTaskid(task_id);
+        if (task == null) {
+            throw new BaseException("Task not found", String.format("can not find this task by task_id: %d", task_id), HttpStatus.NOT_FOUND);
+        }
+        String formatter = task.getFormatter();
+        logger.info(formatter);
+        if (new JSONObject(formatter).keySet().isEmpty()) {
+            throw new BaseException("Formatter not find", String.format("task %d don't have formatrer", task_id), HttpStatus.NOT_FOUND);
+        }
+
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(formatter);
+
+    }
+
     @GetMapping("/")
     public ResponseEntity<String> getTasks(@RequestParam Map<String, String> requestParams) {
         int pageNum = 0;
@@ -192,7 +217,6 @@ public class TaskController {
         throw new BaseException("No such task", "can not find task by this id", HttpStatus.NOT_FOUND);
 
     }
-
 
     @PatchMapping(value = "/{id}", produces = {"application/json;**charset=UTF-8**"})
     public ResponseEntity<String> updateTask(@PathVariable(value = "id") String id,
