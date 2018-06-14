@@ -73,7 +73,10 @@ public class TaskController {
     public ResponseEntity createTask(@RequestBody Map<String, Map<String, Object>> payload) throws BaseException {
         logger.info("try to create a task");
         Map<String, Object> data = payload.get("data");
-        int user_id = (int) data.get("user_id");
+        Integer user_id = (Integer) data.get("user_id");
+        if(user_id == null){
+            throw new BaseException("json error","user_id can not be null",HttpStatus.BAD_REQUEST);
+        }
         Map<String, Object> map = (Map<String, Object>) data.get("formatter");
         JSONObject jsonObject = new JSONObject(map);
         String formatter = jsonObject.toString();
@@ -81,13 +84,17 @@ public class TaskController {
         String start_time = (String) data.get("start_time");
         String deadline = (String) data.get("deadline");
         String description = (String) data.get("description");
-        int type = (int) data.get("type");
-
+        String name = (String) data.get("name");
+        Integer type = (Integer) data.get("type");
+        if(type == null){
+            throw new BaseException("json error","type can not be null",HttpStatus.BAD_REQUEST);
+        }
 
         logger.info("finish extract task information");
-        taskService.createTask(user_id, formatter, title, start_time, deadline, description, type);
-
-        return new ResponseEntity(HttpStatus.CREATED);
+        Task task = taskService.createTask(user_id, formatter, title, start_time, deadline, description, type, name);
+        //TODO : return 201 but now return 200
+        return getTaskById(String.valueOf(task.getTaskid()));
+//        return new ResponseEntity(HttpStatus.CREATED);
     }
 
 

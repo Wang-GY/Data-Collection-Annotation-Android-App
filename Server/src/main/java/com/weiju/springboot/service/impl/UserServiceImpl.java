@@ -95,8 +95,9 @@ public class UserServiceImpl implements UserService {
                 case "username":
                     user.setUsername((String) user_info.get(key));
                     break;
-                default:
-                    throw new BaseException("update fail", String.format("can not update this field: %s, you are not allowed or key error", key), HttpStatus.BAD_REQUEST);
+                    // allow extra information. do nothing
+//                default:
+//                    throw new BaseException("update fail", String.format("can not update this field: %s, you are not allowed or key error", key), HttpStatus.BAD_REQUEST);
 
             }
 
