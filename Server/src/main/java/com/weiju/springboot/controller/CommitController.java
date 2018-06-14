@@ -142,49 +142,6 @@ public class CommitController {
         //return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
     }
 
-    /**
-     * 处理采集任务的提交申请
-     *
-     * @param commit_data
-     * @return
-     */
-    private ResponseEntity<String> uploadCollectionCommit(Map<String, Object> commit_data) throws BaseException {
-        try {
-
-            Integer task_id = (Integer) commit_data.get("task_id");
-            Integer committer_id = (Integer) commit_data.get("user_id");
-            Integer size = (Integer) commit_data.get("size");
-            Integer commit_id = (Integer) commit_data.get("commit_id");
-
-            if (task_id == null || committer_id == null || size == null) {
-                throw new BaseException("json key error: task_id or committer_id or size not found", HttpStatus.NOT_FOUND);
-            }
-
-            // find by commit_id
-            // Commit commit = commitService.save(task_id, committer_id, size);
-            Commit commit = commitRepository.findByCommitid(commit_id);
-            if (commit == null) {
-                throw new BaseException("commit_id not found", HttpStatus.NOT_FOUND);
-            }
-
-            if (commit.getTask().getType() != 1) {
-                throw new BaseException("task_type not match", "this not a collection task", HttpStatus.BAD_REQUEST);
-            }
-            // construct response data meta error format
-            JSONObject response = new JSONObject();
-            JSONObject data = new JSONObject();
-            data.put("commit_id", commit.getCommitid());
-            response.put("data", data);
-
-            return ResponseEntity.created(null).contentType(MediaType.APPLICATION_JSON).body(response.toString());
-            //return new ResponseEntity<>(response.toString(), HttpStatus.CREATED);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new BaseException("exception", HttpStatus.INTERNAL_SERVER_ERROR, e);
-        }
-
-    }
 
     /**
      * 处理标注任务的提交

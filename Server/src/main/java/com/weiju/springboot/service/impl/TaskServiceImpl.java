@@ -38,16 +38,18 @@ public class TaskServiceImpl implements TaskService {
 
     private static Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
     private static FileSystem fs = FileSystems.getDefault();
+    private final FileService fileService;
 
     @Autowired
     private final Environment environment;
 
     public TaskServiceImpl(JdbcTemplate jdbcTemplate, TaskRepository taskRepository,
-                           UserRepository userRepository, Environment environment) {
+                           UserRepository userRepository, Environment environment, FileService fileService) {
         this.jdbcTemplate = jdbcTemplate;
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.environment = environment;
+        this.fileService = fileService;
     }
 
     @Override
@@ -150,6 +152,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<String> getPicsByTaskId(int task_id) {
         String basePath = Paths.get(".").toAbsolutePath().normalize().toString();
+
+
         String picPath = basePath + fs.getSeparator() + "data" + fs.getSeparator() + "tasks"
                 + fs.getSeparator() + task_id + fs.getSeparator() + "pictures";
 
@@ -163,9 +167,9 @@ public class TaskServiceImpl implements TaskService {
         if (files != null) {
             for (File file : files) {
                 if (file.isFile()) {
-                    fileURIs.add("http://" + ip + ":" + port + "/api/tasks/" + task_id
-                            + "/pictures/" + file.getName()
-                    );
+                    String relativePath = "/tasks/"
+                            + task_id + "/pictures/" + file.getName();
+                    fileURIs.add(fileService.relativePathToUrl(relativePath));
                 }
 
             }

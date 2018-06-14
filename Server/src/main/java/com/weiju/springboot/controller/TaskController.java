@@ -74,8 +74,8 @@ public class TaskController {
         logger.info("try to create a task");
         Map<String, Object> data = payload.get("data");
         Integer user_id = (Integer) data.get("user_id");
-        if(user_id == null){
-            throw new BaseException("json error","user_id can not be null",HttpStatus.BAD_REQUEST);
+        if (user_id == null) {
+            throw new BaseException("json error", "user_id can not be null", HttpStatus.BAD_REQUEST);
         }
         Map<String, Object> map = (Map<String, Object>) data.get("formatter");
         JSONObject jsonObject = new JSONObject(map);
@@ -86,8 +86,8 @@ public class TaskController {
         String description = (String) data.get("description");
         String name = (String) data.get("name");
         Integer type = (Integer) data.get("type");
-        if(type == null){
-            throw new BaseException("json error","type can not be null",HttpStatus.BAD_REQUEST);
+        if (type == null) {
+            throw new BaseException("json error", "type can not be null", HttpStatus.BAD_REQUEST);
         }
 
         logger.info("finish extract task information");
@@ -96,7 +96,6 @@ public class TaskController {
         return getTaskById(String.valueOf(task.getTaskid()));
 //        return new ResponseEntity(HttpStatus.CREATED);
     }
-
 
     @GetMapping("/")
     public ResponseEntity<String> getTasks(@RequestParam Map<String, String> requestParams) {
