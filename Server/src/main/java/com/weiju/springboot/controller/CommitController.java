@@ -117,7 +117,9 @@ public class CommitController {
             if (pictures.size() != tags.size()) {
                 throw new BaseException("json error", "pictures and tags can not match", HttpStatus.BAD_REQUEST);
             }
-
+            if(pictures.isEmpty()){
+                throw new BaseException("json error","upload empty data",HttpStatus.BAD_REQUEST);
+            }
             if (pictures.size() > commit.getSize() - commitDatas.size()) {
                 throw new BaseException("Commit too many entries", String.format("you can upload at most %d entries but you are trying to upload %d entries", commit.getSize() - commit.getCommitDataList().size(), results.size()), HttpStatus.BAD_REQUEST);
             }
