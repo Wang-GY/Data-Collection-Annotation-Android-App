@@ -52,7 +52,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task createTask(int user_id, String formater, String title, String start_time, String deadline,
-                           String description, int type, String name) throws BaseException {
+                           String description, int type, String name, String cover) throws BaseException {
         if (!userRepository.existsById(user_id)) {
             throw new BaseException("user not exist", "can not find user by user_id", HttpStatus.NOT_FOUND);
         }
@@ -65,6 +65,7 @@ public class TaskServiceImpl implements TaskService {
         task.setDescription(description);
         task.setType(type);
         task.setName(name);
+        task.setCover(cover);
         try {
             taskRepository.save(task);
         } catch (Exception e) {

@@ -29,6 +29,8 @@ public class UserServiceImpl implements UserService {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final String DEFAULT_AVATAR = "http://ww1.sinaimg.cn/large/006lTfYGgy1fsb881kvpjj307v07vwec.jpg";
+
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            JdbcTemplate jdbcTemplate
@@ -49,7 +51,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setEmail(email);
         user.setHashed_password(hashPassword(password));
-
+        user.setAvatar(DEFAULT_AVATAR);
         userRepository.save(user);
         return user;
 
@@ -87,7 +89,7 @@ public class UserServiceImpl implements UserService {
                     user.setGender((Integer) user_info.get(key));
                     break;
                 case "phone":
-                    user.setAvatar((String) user_info.get(key));
+                    user.setPhone((String) user_info.get(key));
                     break;
                 case "avatar":
                     user.setAvatar((String) user_info.get(key));
@@ -95,7 +97,7 @@ public class UserServiceImpl implements UserService {
                 case "username":
                     user.setUsername((String) user_info.get(key));
                     break;
-                    // allow extra information. do nothing
+                // allow extra information. do nothing
 //                default:
 //                    throw new BaseException("update fail", String.format("can not update this field: %s, you are not allowed or key error", key), HttpStatus.BAD_REQUEST);
 

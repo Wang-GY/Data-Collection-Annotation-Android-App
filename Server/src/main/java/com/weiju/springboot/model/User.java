@@ -49,6 +49,16 @@ public class User {
     @Column(name = "balance")
     private int balance;
 
+    public int getCredit() {
+        return credit;
+    }
+
+    public void setCredit(int credit) {
+        this.credit = credit;
+    }
+
+    @Column(name = "credit")
+    private int credit;
 
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Task.class)
     @JsonIgnore

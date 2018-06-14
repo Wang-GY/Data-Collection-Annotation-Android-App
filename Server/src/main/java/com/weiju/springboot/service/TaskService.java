@@ -12,7 +12,7 @@ public interface TaskService {
 
 
     Task createTask(int user_id, String formater, String title, String start_time, String deadline,
-                    String description, int type, String name) throws BaseException;
+                    String description, int type, String name, String cover) throws BaseException;
 
     public Task getTaskProfile(int id);
 

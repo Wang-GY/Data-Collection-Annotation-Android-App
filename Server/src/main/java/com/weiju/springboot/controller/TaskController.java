@@ -87,13 +87,14 @@ public class TaskController {
         String deadline = (String) data.get("deadline");
         String description = (String) data.get("description");
         String name = (String) data.get("name");
+        String cover = (String) data.get("cover");
         Integer type = (Integer) data.get("type");
         if (type == null) {
             throw new BaseException("json error", "type can not be null", HttpStatus.BAD_REQUEST);
         }
 
         logger.info("finish extract task information");
-        Task task = taskService.createTask(user_id, formatter, title, start_time, deadline, description, type, name);
+        Task task = taskService.createTask(user_id, formatter, title, start_time, deadline, description, type, name, cover);
         //TODO : return 201 but now return 200
         return getTaskById(String.valueOf(task.getTaskid()));
 //        return new ResponseEntity(HttpStatus.CREATED);
@@ -155,7 +156,8 @@ public class TaskController {
             taskJSON.put("progress", task.getProgress());
             taskJSON.put("deadline", task.getDeadline());
             //taskJSON.put("pictures", taskService.getPicsByTaskId(task.getTaskid()));
-            taskJSON.put("formatter", new JSONObject(task.getFormatter()));
+            if (task.getFormatter() != null)
+                taskJSON.put("formatter", new JSONObject(task.getFormatter()));
             taskJSON.put("cover", task.getCover());
             tasksInfo.add(taskJSON);
         }
